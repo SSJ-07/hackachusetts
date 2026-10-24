@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "gtfs-mcp": {
+      "command": ".venv/bin/python",
+      "args": ["mcp/gtfs-mcp/server.py"],
+      "env": {}
+    },
+    "reach-mcp": {
+      "command": ".venv/bin/python",
+      "args": ["mcp/reach-mcp/server.py"],
+      "env": {}
+    }
+  }
+}
