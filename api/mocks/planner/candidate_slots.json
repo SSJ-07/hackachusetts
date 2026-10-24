@@ -1,0 +1,9 @@
+{
+  "_mock_notice": "MOCK candidate slots. 'mock-clinic-gi' is not a real clinic and these are not posted hours. start = seconds since local midnight (28800 = 08:00, 55800 = 15:30). M3's data/manual/clinic_schedules.csv replaces this.",
+  "slots": {
+    "colonoscopy": [
+      { "clinic_id": "mock-clinic-gi", "date": "2026-11-12", "start": 28800 },
+      { "clinic_id": "mock-clinic-gi", "date": "2026-11-12", "start": 55800 }
+    ]
+  }
+}

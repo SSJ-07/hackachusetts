@@ -1,0 +1,30 @@
+{
+  "_mock_notice": "MOCK answers standing in for engine.round_trip (M1). Stops and route 'MOCK-*' are not PVTA. Times are seconds since local midnight. Queries not listed here are reported unreachable.",
+  "records": [
+    {
+      "origin": "250130000000", "clinic": "mock-clinic-gi", "date": "2026-11-12", "start": 28800,
+      "result": {
+        "reachable": false, "out_legs": [], "ret_legs": [], "last_bus_home": null,
+        "reason": "MOCK: no outbound arrival before the check-in buffer"
+      }
+    },
+    {
+      "origin": "250130000000", "clinic": "mock-clinic-gi", "date": "2026-11-12", "start": 55800,
+      "result": {
+        "reachable": true,
+        "out_legs": [
+          { "kind": "walk", "from_stop": "origin", "to_stop": "MOCK-S1", "route_id": null, "dep": 54060, "arr": 54360 },
+          { "kind": "bus", "from_stop": "MOCK-S1", "to_stop": "MOCK-S2", "route_id": "MOCK-R1", "dep": 54360, "arr": 55020 },
+          { "kind": "walk", "from_stop": "MOCK-S2", "to_stop": "clinic", "route_id": null, "dep": 55020, "arr": 55140 }
+        ],
+        "ret_legs": [
+          { "kind": "walk", "from_stop": "clinic", "to_stop": "MOCK-S2", "route_id": null, "dep": 63000, "arr": 63120 },
+          { "kind": "bus", "from_stop": "MOCK-S2", "to_stop": "MOCK-S1", "route_id": "MOCK-R1", "dep": 63300, "arr": 63960 },
+          { "kind": "walk", "from_stop": "MOCK-S1", "to_stop": "origin", "route_id": null, "dep": 63960, "arr": 64260 }
+        ],
+        "last_bus_home": 66000,
+        "reason": "MOCK: round trip available"
+      }
+    }
+  ]
+}

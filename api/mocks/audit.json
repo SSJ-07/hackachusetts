@@ -1,0 +1,15 @@
+{
+  "_mock_notice": "MOCK for GET /audit and POST /whatif (owner M2). Values are the illustrative example from docs/contracts.md section 3, not computed. 'day' is replaced with the requested day.",
+  "cells": [
+    { "day": "mon", "hour": 8, "share": 0.12, "n": 540, "reached": 65 }
+  ],
+  "equity": {
+    "ej":       { "share": 0.10, "n": 320 },
+    "lep":      { "share": 0.08, "n": 140 },
+    "age65":    { "share": 0.15, "n": 90 },
+    "zero_veh": { "share": 0.12, "n": 540 }
+  },
+  "sources": [
+    { "name": "MOCK data (illustrative, not computed)", "vintage": "mock", "url": "docs/contracts.md" }
+  ]
+}

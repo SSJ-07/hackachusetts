@@ -1,0 +1,13 @@
+{
+  "_mock_notice": "MOCK PT-1 field list. Field ids are placeholders, NOT the real MassHealth PT-1 fields. M3 replaces this with data/manual/pt1_fields.json. A null source means a person fills it.",
+  "fields": [
+    { "id": "mock_member_ref", "label": "MOCK member reference", "source": "patient.id" },
+    { "id": "mock_preferred_language", "label": "MOCK preferred language", "source": "patient.language" },
+    { "id": "mock_visit_type", "label": "MOCK visit type", "source": "visit.type" },
+    { "id": "mock_destination", "label": "MOCK destination", "source": "visit.clinic_id" },
+    { "id": "mock_appointment_date", "label": "MOCK appointment date", "source": "visit.date" },
+    { "id": "mock_appointment_time", "label": "MOCK appointment time", "source": "visit.start_time" },
+    { "id": "mock_escort_needed", "label": "MOCK escort needed", "source": "visit.escort_required" },
+    { "id": "mock_provider_attestation", "label": "MOCK provider attestation", "source": null }
+  ]
+}

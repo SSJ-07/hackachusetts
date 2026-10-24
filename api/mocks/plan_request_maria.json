@@ -1,0 +1,12 @@
+{
+  "patient": { "id": "maria", "origin_bg": "250130000000", "lang": "es" },
+  "visit_type": "colonoscopy",
+  "barriers": {
+    "has_transport": false,
+    "work_shift": [7, 15],
+    "childcare": false,
+    "has_escort": false,
+    "cost_worry": true,
+    "language": "es"
+  }
+}
