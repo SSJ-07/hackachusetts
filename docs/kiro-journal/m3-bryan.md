@@ -30,3 +30,8 @@ outcome: Greenfield 11.3% / BAY_GI 31.1% reachable; PVTA 522 errors (all shapes,
 what: VP-23 plan_b templates (EN/ES, unsigned) + VP-24 volunteer-driver window data, wired into planner/ with properties
 kiro: Crew wrote driver_windows.py, plan_b.py, solver wiring, 5 Hypothesis properties + unit tests; web-sourced 2 usable windows (Hadley, Southampton), 1 labelled gap
 outcome: 500 tests green; plan_b stays null until a human signs signoff.json
+
+## 2026-10-24 19:27 · m3-bryan · Crew · topic: pbt
+what: B3: engine/equity.py carries ACS 90% MOEs to CIs on the EJ/LEP/65+/zero-vehicle shares; /audit equity_ci; contracts.md + contract shapes updated
+kiro: Crew added the ACS _M fetch (separate file, 50-var API limit), Census handbook ch.8 formulas, 10 Hypothesis/unit tests; property shrink found float-cancellation + tiny-n overflow, both fixed
+outcome: CI shares equal equity shares exactly; e.g. BAY_GI zero_veh 50.8% [47.9, 53.6]; contract + property suites green
