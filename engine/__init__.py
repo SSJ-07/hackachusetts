@@ -6,7 +6,7 @@ Public surface used across the team (see docs/contracts.md §2):
     - raptor: round_trip(...)  (RAPTOR, the authoritative implementation)
 """
 
-from engine.raptor import earliest_arrival, one_way, round_trip
+from engine.raptor import earliest_arrival, latest_departure, one_way, round_trip
 from engine.types import (
     ClinicRef,
     Leg,
@@ -22,6 +22,7 @@ __all__ = [
     "OriginRef",
     "RoundTripResult",
     "earliest_arrival",
+    "latest_departure",
     "one_way",
     "round_trip",
 ]

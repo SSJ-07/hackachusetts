@@ -1,0 +1,9 @@
+{
+  "name": "journal-on-spec-steering-save",
+  "description": "When a steering or spec file is saved in the Kiro IDE, note it in docs/kiro-journal.md — these edits shape every agent's behaviour and are the heart of the steering/spec write-up. Fires in the Kiro IDE (fileEdited). Not in Web/Crew.",
+  "trigger": "fileEdited",
+  "matcher": ".kiro/steering/**,.kiro/specs/**",
+  "action": "python scripts/log_kiro.py --member \"${KIRO_USER:-team}\" --tool IDE --topic steering --what \"edited steering/spec: ${KIRO_FILE:-a .kiro file}\" --kiro \"this file is injected into every agent session, so the change steers all future answers\"",
+  "timeout": 20,
+  "enabled": true
+}
