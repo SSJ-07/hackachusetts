@@ -1,0 +1,3 @@
+# MCP server runtime. Install into the repo venv:
+#   python3 -m venv .venv && .venv/bin/pip install -r mcp/requirements.txt
+mcp==2.3.0
