@@ -168,10 +168,13 @@ def _run_raptor_backward(
     # best[stop] = (latest_departure_from_stop, legs_from_here_to_a_target)
     best: dict[str, BLabel] = {s: (t, []) for s, t in targets.items()}
     _relax_transfers_backward(tt, best, set(targets))
-    marked: set[str] = set(best)
+    # Same invariant as the forward search (bug-transfer-limit): round k may only
+    # alight at stops reached in round k-1, read from a frozen snapshot, so one
+    # round cannot chain several buses.
+    reachable_prev: dict[str, BLabel] = dict(best)
 
     for _round in range(limits.max_transfers + 1):
-        if not marked:
+        if not reachable_prev:
             break
         improved: set[str] = set()
         for trip_id, sts in tt.trip_stop_times.items():
@@ -181,7 +184,7 @@ def _run_raptor_backward(
             alight_label: BLabel | None = None
             for st in reversed(sts):  # from last seq to first
                 if alight_st is None:
-                    cur = best.get(st.stop_id)
+                    cur = reachable_prev.get(st.stop_id)
                     if cur is None:
                         continue
                     latest_ok = cur[0]
@@ -210,7 +213,7 @@ def _run_raptor_backward(
                     best[st.stop_id] = (st.dep, [leg] + list(alight_label[1]))
                     improved.add(st.stop_id)
         _relax_transfers_backward(tt, best, improved)
-        marked = improved
+        reachable_prev = {s: best[s] for s in improved}
     return best
 
 

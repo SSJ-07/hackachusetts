@@ -1,0 +1,9 @@
+{
+  "name": "data-freshness-pre-task",
+  "description": "Before a Kiro IDE spec task runs, warn (never block) if cached source data is stale: data/raw/manifest.json missing or older than 7 days, or the PVTA GTFS feed_end_date within 14 days. Exits 0 always — advisory only. UNVERIFIED TRIGGER: 'preTaskExecution' is NOT one of the two confirmed IDE trigger names in this repo (fileEdited, postTaskExecution) — see .kiro/hooks/README.md. If the IDE does not support preTaskExecution, run scripts/hooks/check_data_fresh.py manually or in CI.",
+  "trigger": "preTaskExecution",
+  "matcher": "*",
+  "action": "python scripts/hooks/check_data_fresh.py",
+  "timeout": 30,
+  "enabled": true
+}

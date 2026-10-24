@@ -1,0 +1,9 @@
+{
+  "name": "traceability-post-task",
+  "description": "After a Kiro IDE spec task finishes, regenerate docs/traceability.md: a table mapping each requirement id (R1.1 / SO-3 / CS-n / RC-n / RT-n / PT-n / VP-n) to its spec and the tests that reference it, listing requirements with no test as gaps. Fires in the Kiro IDE (postTaskExecution — verified trigger). File hooks fire only on agent/IDE edits, so CI should also regenerate this.",
+  "trigger": "postTaskExecution",
+  "matcher": "*",
+  "action": "python scripts/hooks/update_traceability.py",
+  "timeout": 60,
+  "enabled": true
+}
