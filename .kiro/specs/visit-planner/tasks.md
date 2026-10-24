@@ -16,8 +16,14 @@
 - [ ] 14. Childcare window: agree a contract change with Sumedh, then add the check + property. _VP-20_
 - [x] 15. Use `cost_worry` / `has_transport` as navigator-facing option flags (fixed kind order unchanged). _VP-21_
 - [x] 16. Recurrence PLAN on the top option (per_week, same-trip-each-session, PT-1-once for rides) from `recurrence_per_week`; property P22. _VP-22_
-- [ ] 17. `plan_b` from reviewed templates (M3). _VP-23_
-- [ ] 18. Volunteer-driver windows for rides (M3 data). _VP-24_
+- [x] 17. `plan_b` from reviewed templates (M3). `planner/plan_b.py` + `planner/templates/{en,es}/plan_b.md`
+  (situations `later_bus` / `last_bus`); used only when `signoff.json` marks that language reviewed, no
+  language fallback. Ships `reviewed: false`, so `plan_b` stays null until a human signs. _VP-23_
+- [x] 18. Volunteer-driver windows for rides (M3 data). `data/manual/volunteer_driver_windows.csv`
+  (web-sourced; unpublished hours are labelled gaps, never used) + `planner/driver_windows.py`.
+  `plan_visit(..., driver_windows, patient_town)`: a ride is `ride_mode: volunteer_driver` with a `window`
+  only when a sourced window for the town covers the whole trip, else `pt1_broker`. Windows never add or
+  drop options. Not wired into the API yet (needs a patient-town input): planner/ only. _VP-24_
 - [x] 19.* Property: itinerary integrity — `last_bus_home` is truly last (plan B vs A waits on M3 templates, VP-23). _VP-14_
 
 Status: **H6 target met with mocks**. Maria (synthetic) gets an escort-aware ride at 15:30,
