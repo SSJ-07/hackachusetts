@@ -76,6 +76,10 @@ def main() -> int:
                 continue
             open_min = to_min(r["open_time"])
             close_min = to_min(r["close_time"])
+            # Clinic APPOINTMENTS use a same-day clock: never emit an end of 24:00+.
+            # Cap an effective close at 23:59 so the latest slot ends <= 23:59.
+            if close_min >= 24 * 60:
+                close_min = 24 * 60 - 1
             visit = VISIT_MIN.get(r["visit_type"].strip(), DEFAULT_VISIT)
             span = close_min - open_min
             if span < visit:

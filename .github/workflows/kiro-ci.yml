@@ -24,6 +24,11 @@ jobs:
           pip install -e ".[dev]" ortools
           if [ -f mcp/requirements.txt ]; then pip install -r mcp/requirements.txt; fi
 
+      - name: Data-quality gate (manual data)
+        # Fails the build on missing sources, bad HH:MM times, or clinic_id
+        # references absent from clinics.csv. (manual-data spec R9.2)
+        run: python scripts/validate_manual.py
+
       - name: Run tests (unit + property + differential + golden)
         # The real gate. Must NOT swallow failures — a red test blocks the PR.
         run: pytest -q
