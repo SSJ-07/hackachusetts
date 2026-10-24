@@ -26,14 +26,18 @@ Status values: `verified` · `needs-manual-verification` · `unsourced`
 ## 2. Escort rule for sedated procedures
 - **Claim (line 71):** "Most endoscopy units won't discharge a sedated patient to a
   bus, or even a taxi, alone (verify per clinic)."
-- **Candidate source:** Facility-level discharge policies (ASGE/ambulatory-surgery
-  sedation discharge guidance is the general basis; each endoscopy unit sets its own).
-- **URL:** (none asserted — policy is per-facility)
-- **Vintage:** n/a
-- **Status:** needs-manual-verification
-- **Note:** The escort requirement is already encoded in `planner/visit_rules.yaml`
-  (colonoscopy escort_required=true). It is a logistics rule, not a clinical claim.
-  Verify the exact discharge policy per target clinic (Baystate GI, etc.).
+- **Candidate source:** ASGE, *Transportation barriers and endoscopic procedures*
+  (Gastrointest Endosc, 2023): "the current standard of practice is to require a
+  responsible adult to escort patients home ... and delay driving." See also the ASGE
+  *Guidelines for sedation and anesthesia in GI endoscopy*.
+- **URL:** https://www.socialwork.va.gov/docs/Kwok-ASGE_Transportation_Barriers-for_Endoscopy_GIE_2023.pdf
+- **Vintage:** 2023 (ASGE)
+- **Status:** verified (as a general standard of practice)
+- **Note:** Reframed from "verify per clinic" to the published ASGE standard — no
+  per-clinic phone call needed. The escort requirement is already encoded in
+  `planner/visit_rules.yaml` (colonoscopy escort_required=true). It is a logistics rule,
+  not a clinical claim. A specific clinic MAY state a stricter policy, but the general
+  escort-home standard is now sourced.
 
 ## 3. Baystate CHNA transport mention
 - **Claim (line 80):** "Access to care and transportation show up again and again in
@@ -77,17 +81,17 @@ Status values: `verified` · `needs-manual-verification` · `unsourced`
 1. **FIT follow-up rate (claim 1):** needs a human to pick ONE citable figure + its
    population from the candidate studies. WHY MANUAL: "around half" spans 46.7%–65%
    across cohorts; stating a single rate as a finding requires choosing and labelling it.
-2. **Escort rule (claim 2):** verify the discharge policy per target endoscopy unit.
-   WHY MANUAL: policies are per-facility and not published as one citable number; may
-   need a phone call to the clinic.
+2. **Escort rule (claim 2):** RESOLVED — now cited to the ASGE 2023 standard of practice
+   (no phone call needed). A target clinic's stricter policy, if any, is optional extra.
 3. **Baystate CHNA (claim 3):** open the current Baystate CHNA PDF and cite the page.
    WHY MANUAL: the claim is about specific document text; requires reading that PDF.
+   NOT a phone call — a document read.
 4. **MassHealth flexible services (claim 4):** confirm current scope + effective date.
-   WHY MANUAL: scope changes by waiver period; only the live mass.gov program page is
-   authoritative, and the current one must be read, not assumed.
+   WHY MANUAL: scope changes by waiver period; the live mass.gov program page is
+   authoritative and blocks automated fetch. NOT a phone call — a page read.
 5. **CMS dialysis shift fields (claim 5):** confirm the exact columns in the dataset's
    data dictionary. WHY MANUAL: requires opening the specific dataset release and reading
-   its schema; field presence cannot be assumed from the dataset name.
+   its schema. NOT a phone call — a schema read.
 
-No URLs above are fabricated. Where I did not confirm an exact page/file, the URL is left
-as a domain-level pointer with an explicit "locate ... do not assume" instruction.
+No remaining item requires a phone call. All are document/page reads a human (or a
+PDF-capable tool) can do. No URLs above are fabricated.
