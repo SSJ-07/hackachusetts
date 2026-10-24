@@ -12,11 +12,13 @@
 - [x] 5. Full suite green locally (328 passed, 5 skipped).
 
 ## Remaining (needs other inputs — see "What I need from you")
-- [ ] 6. Add `CHCFC_GREENFIELD` to `data/manual/clinic_stops.csv` with a real FRTA stop_id
-  near 102 Main St Greenfield (candidate: a High St / JWO Transit Center stop from
-  `frta_minigtfs/stops.txt`). Needs: confirm the nearest stop_id.
-- [ ] 7. `python pipeline/build_cube.py` for CHCFC Greenfield, using a PVTA+FRTA merged
-  Timetable. Needs: the PVTA cache (`data/cache/pvta`) present locally or in CI, and a
-  confirmation from M2 that `build_cube.py` should call `from_gtfs_dirs` (today it loads a
-  single feed — a one-line wiring change M2 or M3 makes together).
+- [x] 6. Added `CHCFC_GREENFIELD` to `data/manual/clinic_stops.csv`, anchored to
+  `frta:2505676` "Main St at Cafe" (96 m from 102 Main St Greenfield, from the real feed).
+- [x] 7a. Wired `pipeline/build_cube.py` to load a merged PVTA+FRTA Timetable when the FRTA
+  feed is present (falls back to PVTA-only), and to resolve bare PVTA clinic ids to their
+  `pvta:` form. Compiles clean.
+- [ ] 7b. RUN `python pipeline/build_cube.py --clinic CHCFC_GREENFIELD`. BLOCKED: needs the
+  data caches — `data/cache/pvta/`, `origins.parquet`, `stops_walk.parquet` — which are
+  git-ignored and built by `make data` (M2's downloads + Census key). Not present on this
+  machine. Run once the caches exist.
 - [ ] 8. M1 review of the `engine/gtfs.py` addition before merge.

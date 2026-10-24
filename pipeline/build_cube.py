@@ -38,6 +38,7 @@ from engine import round_trip
 from engine.types import DEFAULT_LIMITS
 
 PVTA_DIR = ROOT / "data" / "cache" / "pvta"
+FRTA_DIR = ROOT / "data" / "manual" / "frta_minigtfs"
 ORIGINS = ROOT / "data" / "cache" / "origins.parquet"
 STOPS_WALK = ROOT / "data" / "cache" / "stops_walk.parquet"
 CLINIC_STOPS = ROOT / "data" / "manual" / "clinic_stops.csv"
@@ -80,10 +81,26 @@ def build_cube(anchor_date: str, only_clinic: str | None = None) -> pd.DataFrame
             date = _day_to_date(day, anchor_date)
             tt = tt_cache.get(date)
             if tt is None:
-                tt = Timetable.from_gtfs_dir(str(PVTA_DIR), date)
+                # Multi-feed: merge PVTA + FRTA so FRTA-anchored rural clinics
+                # (e.g. CHCFC Greenfield, stop frta:...) are routable. Falls back
+                # to PVTA-only if the FRTA feed is absent. (spec: multi-feed)
+                if FRTA_DIR.exists():
+                    tt = Timetable.from_gtfs_dirs(
+                        {"pvta": str(PVTA_DIR), "frta": str(FRTA_DIR)}, date
+                    )
+                else:
+                    tt = Timetable.from_gtfs_dir(str(PVTA_DIR), date)
                 tt_cache[date] = tt
             if clinic_stop not in tt.stops:
-                continue  # clinic's anchor stop not in the feed on this date
+                # Under multi-feed, PVTA ids are prefixed (pvta:1053). Clinic rows
+                # may carry a bare id (legacy PVTA) or an agency-prefixed id
+                # (frta:...). Resolve a bare id to its pvta: form if present.
+                resolved = clinic_stop
+                if clinic_stop not in tt.stops and f"pvta:{clinic_stop}" in tt.stops:
+                    resolved = f"pvta:{clinic_stop}"
+                if resolved not in tt.stops:
+                    continue  # clinic's anchor stop not in the feed on this date
+                clinic_stop = resolved
             cs = tt.stops[clinic_stop]
             clinic_ref = (cs.lat, cs.lon)
             for hour in HOURS:
