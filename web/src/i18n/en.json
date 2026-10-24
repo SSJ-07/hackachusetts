@@ -95,7 +95,23 @@
     "title": "Block groups",
     "notLoaded": "Map data not loaded. The block-group map is hidden, but all numbers above come from the API.",
     "legendTitle": "Share reached",
-    "desert": "Transit desert (no reach)"
+    "desert": "Transit desert (no reach)",
+    "lensTitle": "Map lens",
+    "lensReach": "Who is here (EJ areas)",
+    "lensRural": "Rural lens: no option at all",
+    "town": "Town",
+    "allTowns": "All towns",
+    "ruralLoading": "Loading the rural lens…",
+    "ruralUnavailable": "The rural lens needs real data (bg_towns.parquet + the rural tables). Run `make data`.",
+    "ruralSummary": "{{none}} block groups ({{noneAdults}} car-less adults) have no transport option at all. {{assisted}} can only get there by dial-a-ride, a Council on Aging driver or PT-1. {{transit}} can reach at least one clinic hour by bus. {{notAssessed}} are outside the rural table.",
+    "verdict": {
+      "transit": "Reachable by bus (some clinic hour)",
+      "assisted_only": "Dial-a-ride / COA driver / PT-1 only",
+      "none": "No option at all",
+      "not_assessed": "Not in the rural table"
+    },
+    "optionsTitle": "What this town has instead of a bus",
+    "optionsSource": "Source"
   },
   "legend": {
     "title": "Share of car-less adults reached",

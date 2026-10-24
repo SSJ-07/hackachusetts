@@ -5,6 +5,7 @@
 // "/api" -> FastAPI; set VITE_API_BASE="/api" to use that proxy instead.
 
 import type {
+  RuralResponse,
   AuditResponse,
   BlockGroupsResponse,
   ClinicsResponse,
@@ -135,6 +136,23 @@ export function getSuggest(
   const q = new URLSearchParams({ clinic, day, k: String(k) });
   if (blocks && blocks.length > 0) q.set("blocks", blocks.join(","));
   return request<SuggestResponse>(`/suggest?${q.toString()}`, { signal });
+}
+
+export interface RuralQuery {
+  /** optional town filter (case-insensitive); omit for every block group */
+  town?: string;
+}
+
+/** GET /rural?town — rural lens: per-block-group "no option at all" verdict.
+ * Mock mode returns an empty, labelled answer: the map shows "needs real data". */
+export function getRural(
+  { town }: RuralQuery = {},
+  signal?: AbortSignal,
+): Promise<RuralResponse> {
+  const q = new URLSearchParams();
+  if (town) q.set("town", town);
+  const qs = q.toString();
+  return request<RuralResponse>(`/rural${qs ? `?${qs}` : ""}`, { signal });
 }
 
 /** POST /plan — build a Visit Planner plan (M4). Synthetic patient only. */

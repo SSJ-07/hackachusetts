@@ -247,3 +247,55 @@ export type _BgOk = _AssertAssignable<
   components["schemas"]["BlockGroupsResponse"],
   BlockGroupsResponse
 >;
+
+/** GET /rural — rural lens (docs/contracts.md §3). */
+export type RuralVerdict = "transit" | "assisted_only" | "none" | "not_assessed";
+
+export interface RuralFeature {
+  bg_geoid: string;
+  town: string;
+  county: string;
+  lat: number;
+  lon: number;
+  carless_adults: number;
+  /** share of ALL cube cells (every clinic × day × hour) that are reachable, 0..1 */
+  transit_share: number;
+  /** no PVTA/FRTA stop within the walk limit */
+  desert: boolean;
+  verdict: RuralVerdict;
+  coverage_tier: string;
+}
+
+export interface RuralVerdictCount {
+  n_bg: number;
+  carless_adults: number;
+}
+
+export interface RuralSummary {
+  n_bg: number;
+  carless_adults: number;
+  by_verdict: Record<string, RuralVerdictCount>;
+}
+
+/** One town's row from the hand-collected rural tables, with its citation. */
+export interface RuralOption {
+  town: string;
+  county?: string | null;
+  coverage_tier?: string | null;
+  has_any_option: boolean;
+  dial_a_ride?: string | null;
+  coa_driver?: string | null;
+  pt1?: string | null;
+  source_url?: string | null;
+  verified_by?: string | null;
+  date?: string | null;
+}
+
+export interface RuralResponse {
+  town?: string | null;
+  features: RuralFeature[];
+  summary: RuralSummary;
+  options: RuralOption[];
+  towns_available: string[];
+  sources: SourceRef[];
+}

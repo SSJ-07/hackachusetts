@@ -25,11 +25,13 @@ from typing import Any
 
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[1]
-CUBE_PATH = ROOT / "data" / "cache" / "cube.parquet"
-ORIGINS_PATH = ROOT / "data" / "cache" / "origins.parquet"
-MANIFEST_PATH = ROOT / "data" / "raw" / "manifest.json"
-PVTA_FEED_INFO = ROOT / "data" / "cache" / "pvta" / "feed_info.txt"
+from engine.paths import ROOT, cache_dir
+
+# SLOT_TO_STOP_CACHE_DIR redirects these (make demo serves data/snapshots/demo-v1/).
+CUBE_PATH = cache_dir() / "cube.parquet"
+ORIGINS_PATH = cache_dir() / "origins.parquet"
+MANIFEST_PATH = (cache_dir() / "manifest.json") if (cache_dir() / "manifest.json").exists() else ROOT / "data" / "raw" / "manifest.json"
+PVTA_FEED_INFO = cache_dir() / "pvta" / "feed_info.txt"
 
 DAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
 COUNTY_FIPS = {"hampden": "25013", "hampshire": "25015", "franklin": "25011"}

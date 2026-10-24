@@ -9,8 +9,8 @@
 - [x] 7. Differential tests RAPTOR == CSA == brute force (`tests/differential/`). 240 agreeing queries.
 - [x] 8. Property tests: soundness, check-in buffer, midnight safety, causality, determinism, monotone-in-access (`tests/property/`).
 - [x] 9. Golden grid round trip + GTFS unit tests (`tests/unit/`).
-- [ ] 10. Golden PVTA trip hand-checked against the real timetable (waits on `data/raw/pvta_gtfs.zip` from M2).
-- [ ] 11. Wire the real feed through `gtfs-mcp` `round_trip` / `plan_trip` (in progress — see `mcp/gtfs-mcp/server.py`).
+- [x] 10. Golden PVTA trips on the real feed: `tests/golden/test_pvta_golden.py` (Holyoke -> Baystate hand-checked; caught the transfer-limit bug -> spec bug-transfer-limit).
+- [x] 11. Real feed wired through `gtfs-mcp` `round_trip` / `plan_trip` / `service_changes` / `validate_feed` (`mcp/gtfs-mcp/server.py`, GTFS_DIR=data/cache/pvta); no stubs remain.
 
 Status: **core complete and cross-validated** (250 tests, 0.54s). Remaining items wait on
 the real PVTA feed landing (M2) and are plumbing, not router logic.

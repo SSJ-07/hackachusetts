@@ -34,8 +34,13 @@ def earliest_arrival(
 ) -> dict[str, Label]:
     """Best (arrival, legs) per stop by exhaustive label-setting search.
 
-    State = (arrival_time, stop, transfers_used, last_leg_was_bus). We pop the
-    earliest arrival first; the first time we settle a stop is its optimum.
+    State = (arrival_time, stop, buses_used, last_leg_was_bus). We pop the earliest
+    arrival first and settle each (stop, buses_used, last_leg_was_bus) STATE once —
+    not each stop once. Under a transfer cap the problem is bi-criteria (time × buses):
+    the earliest label at a stop may have spent every allowed bus while a later label
+    with fewer buses can still board onward, so settling per stop lost downstream
+    stops (spec bug-csa-transfer-cap — the same bug was in CSA). `best[stop]` is the
+    first (earliest) state settled for that stop.
     """
     srcs = {s: (max(t, depart_after) if depart_after is not None else t) for s, t in from_stops.items()}
     # priority queue of (time, seq, stop, transfers, rode_bus_last, legs);
@@ -46,14 +51,22 @@ def earliest_arrival(
         heapq.heappush(pq, (t, counter, s, 0, False, []))
         counter += 1
     best: dict[str, Label] = {}
-    settled: set[str] = set()
+    settled: set[tuple[str, int, bool]] = set()
+
+    def dominated(stop: str, transfers: int, rode_bus: bool) -> bool:
+        # already settled with no more buses used (a walk-arrival state dominates a
+        # bus-arrival one at equal count: it needs no transfer buffer)
+        return any((stop, k, rb) in settled
+                   for k in range(transfers + 1)
+                   for rb in ((False, True) if rode_bus else (False,)))
 
     while pq:
         t, _seq, stop, transfers, rode_bus, legs = heapq.heappop(pq)
-        if stop in settled:
+        if dominated(stop, transfers, rode_bus):
             continue
-        settled.add(stop)
-        best[stop] = (t, legs)
+        settled.add((stop, transfers, rode_bus))
+        if stop not in best:  # pops are in time order: first settle of a stop is its optimum
+            best[stop] = (t, legs)
         if transfers >= limits.max_transfers + 1:
             continue
         # ride every trip boardable at `stop` at/after t (+ transfer buffer if we just rode a bus)
@@ -68,7 +81,7 @@ def earliest_arrival(
                     continue
                 if nxt.arr - st.dep > limits.max_leg_seconds:
                     break  # ordered by seq, so arrivals only grow
-                if nxt.stop_id in settled:
+                if dominated(nxt.stop_id, transfers + 1, True):
                     continue
                 nlegs = legs + [
                     Leg(kind="bus", from_stop=stop, to_stop=nxt.stop_id,
@@ -79,7 +92,7 @@ def earliest_arrival(
                 counter += 1
         # foot transfers
         for tr in tt.transfers_from.get(stop, ()):
-            if tr.to_stop in settled:
+            if dominated(tr.to_stop, transfers, rode_bus):
                 continue
             arr = t + tr.min_transfer_time
             nlegs = legs + [Leg(kind="walk", from_stop=stop, to_stop=tr.to_stop, route_id=None, dep=t, arr=arr)]
