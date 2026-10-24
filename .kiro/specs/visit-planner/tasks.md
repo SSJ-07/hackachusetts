@@ -10,9 +10,9 @@
 - [x] 8. Labelled mocks + synthetic Maria (`api/mocks/`). _VP-17_
 - [x] 9. Unit tests (`tests/unit/test_planner_*.py`) and contract tests (`tests/contract/`). _VP-3..VP-19_
 - [x] 10. Property tests P15–P18, P-rank, P-none (`tests/property/test_planner_properties.py`). _VP-5, VP-6, VP-8, VP-10, VP-13, VP-16_
-- [ ] 11. Wire `engine.round_trip` in real mode once a PVTA timetable + `stops_walk.parquet` exist (M1/M2). _VP-6_
-- [ ] 12. Load candidate slots from `data/manual/clinic_schedules.csv` (M3). _VP-1_
-- [ ] 13. Switch to M3's `pt1_fields.json` and real rulebook values; confirm file shapes with M3. _VP-2, VP-15_
+- [ ] 11. Wire `engine.round_trip` in real mode. **Blocked:** `engine.round_trip(tt, ...)` exists, but needs a loaded PVTA `Timetable` + `data/cache/stops_walk.parquet` for origin_bg/clinic_id→stop resolution (M1/M2). Real mode 503s here until then. _VP-6_
+- [x] 12. Load candidate slots from `data/manual/clinic_schedules.csv`; service→visit-type map; illustrative labelled (`planner/slots.py`). _VP-1_
+- [x] 13. Real mode reads M3's `pt1_fields.json` (inventory adapter) + real `visit_rules.yaml`; file shapes confirmed (`planner/pt1.py::load_fields_inventory`, `api/deps.py`). _VP-2, VP-15_
 - [ ] 14. Childcare window: agree a contract change with Sumedh, then add the check + property. _VP-20_
 - [x] 15. Use `cost_worry` / `has_transport` as navigator-facing option flags (fixed kind order unchanged). _VP-21_
 - [x] 16. Recurrence annotation on the top option from `recurrence_per_week` (e.g. dialysis per week). _VP-22_

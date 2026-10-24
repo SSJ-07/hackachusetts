@@ -69,6 +69,57 @@ def load_fields(path: Path) -> tuple[Pt1Field, ...]:
         raise Pt1FieldsError(f"PT-1 fields file is not valid JSON: {exc}") from exc
 
 
+# M3's data/manual/pt1_fields.json is a FIELD INVENTORY verified from MassHealth
+# bulletins: each field carries `key`/`label`/`type`, not the planner `source` mapping
+# the pre-fill needs. Only a few of those fields are auto-fillable from synthetic planner
+# data; the rest are provider/member attestations a person completes (source=None). This
+# map is the planner's, not M3's: it names which inventory keys the planner can fill and
+# from what. Keys absent here are emitted with source=None (left for a human).
+_REAL_FIELD_SOURCES: dict[str, str | None] = {
+    "member_name": None,            # synthetic patient has no name field; person fills
+    "member_id": "patient.id",
+    "member_dob": None,             # not in planner inputs
+    "eligible_for_transportation": None,
+    "pickup_address": None,         # from origin_bg -> address (not resolved here)
+    "submitter_provider": None,
+    "treating_provider_same_as_submitter": None,
+    "treating_provider_npi": None,
+    "treating_provider_name": None,
+    "treatment_address": "visit.clinic_id",  # clinic id stands in for destination
+    "service_animal": None,
+    "transport_mode": None,         # depends on escort/medical necessity; person decides
+    "effective_dates": "visit.date",
+}
+
+
+def load_fields_inventory(path: Path) -> tuple[Pt1Field, ...]:
+    """Adapt M3's verified PT-1 field INVENTORY (`fields[].key/label/...`) into planner
+    Pt1Fields, mapping each inventory `key` to a planner source via _REAL_FIELD_SOURCES.
+
+    Unknown keys are kept with source=None (a human fills them) rather than dropped, so
+    the pre-fill still lists every real form field.
+    """
+    if not path.is_file():
+        raise Pt1FieldsError(f"PT-1 fields file not found: {path}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise Pt1FieldsError(f"PT-1 fields file is not valid JSON: {exc}") from exc
+    if not isinstance(data, Mapping) or not isinstance(data.get("fields"), list):
+        raise Pt1FieldsError("PT-1 inventory must have a top-level 'fields' list")
+    fields: list[Pt1Field] = []
+    seen: set[str] = set()
+    for raw in data["fields"]:
+        if not isinstance(raw, Mapping) or not isinstance(raw.get("key"), str) or not raw["key"]:
+            raise Pt1FieldsError("each PT-1 inventory field needs a non-empty string 'key'")
+        key = raw["key"]
+        if key in seen:
+            raise Pt1FieldsError(f"duplicate PT-1 field key: {key!r}")
+        seen.add(key)
+        fields.append(Pt1Field(id=key, source=_REAL_FIELD_SOURCES.get(key)))
+    return tuple(fields)
+
+
 def _hhmm(seconds: int) -> str:
     # Appointment starts are same-day; keep >24h values visible rather than wrapping.
     return f"{seconds // 3600:02d}:{seconds % 3600 // 60:02d}"
