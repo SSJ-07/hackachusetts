@@ -1,6 +1,6 @@
-# Requirements — Manual Data Collection (M3)
+# Requirements Document
 
-Branch: `M3-Bryan`. Owner: M3. Status: draft.
+Manual Data Collection (M3). Branch: `M3-Bryan`. Owner: M3. Status: draft.
 
 ## Introduction
 
@@ -15,6 +15,21 @@ cannot close.
 All requirements inherit the non-negotiable guardrails in `AGENTS.md`:
 logistics only, synthetic patients only, every number carries source + vintage,
 patient-facing text only from human-reviewed templates, no secrets committed.
+
+## Glossary
+
+- **PT-1**: The MassHealth transportation request form whose field schema `/plan` pre-fills via `pt1_prefill`.
+- **GTFS**: General Transit Feed Specification; the standard text-file format for transit schedules used by the FRTA mini-feed.
+- **FRTA**: Franklin Regional Transit Authority, the agency whose routes are hand-encoded in the mini-GTFS set.
+- **FICTIONAL / demo slot**: A clinic slot that is an illustrative template value, labelled not-bookable and never presented as a finding.
+- **TODO-VERIFY**: A cell value standing in for data not yet confirmed against a cited source; never an invented value.
+- **Provenance**: The `source` plus `vintage` pair that every on-screen number must trace back to; a value lacking it is a defect.
+- **MISSING / MANUAL-CHECK**: The closing section each artifact carries, naming the human step required and why it cannot be automated.
+- **PRAPARE**: Protocol for Responding to and Assessing Patients' Assets, Risks, and Experiences; a source for barrier-screening questions.
+- **AHC HRSN**: Accountable Health Communities Health-Related Social Needs screening tool; a source for barrier-screening questions.
+- **DRAFT ES**: Spanish template or question text labelled DRAFT, not treated as patient-facing until human review.
+- **Clinic Audit**: The component that computes reachability per clinic-hour from posted clinic schedules.
+- **Visit Planner**: The component that offers ride options and pre-fills transportation requests for a patient visit.
 
 ## Requirements
 
@@ -35,7 +50,7 @@ Acceptance criteria (EARS):
 **User story:** As the Visit Planner, I need per-town ride options so I can offer an
 escort-aware or demand-response ride where transit fails.
 
-Acceptance criteria:
+Acceptance criteria
 - R2.1 THE file `data/manual/rural_options.csv` SHALL contain one row per Franklin and
   Hampshire County town with columns: `town, dial_a_ride, coa_driver, pt1, hours,
   source_url, verified_by, date`.
