@@ -45,3 +45,13 @@ outcome: origins 506 bgs / 55,901 carless adults; 193 transit-desert bgs; cube 4
 what: Fixed reachability cube under-reporting (1.2% flat -> 31% varying by hour)
 kiro: rebuilt pipeline/build_cube.py to call engine.round_trip per cell using block-group lat/lon instead of stop-membership join
 outcome: Baystate GI cube: 7am 19% to noon 45% to 6pm 14%; cube==round_trip 60/60; 318 tests green
+
+## 2026-10-24 17:20 · sumedh · Crew · topic: spec
+what: M1 Phase A via 4 parallel Crew agents: real /audit+/whatif, schedule-optimizer + real reach-mcp, midnight PBT, web Audit screen (PR #7)
+kiro: Crew split the work across 4 agents with separate files, using one shared engine/audit.py; every claimed file and test was re-checked by the parent before merging
+outcome: pytest green, web build passes, CI green; squash-merged so a 6.5 MB data zip never entered main
+
+## 2026-10-24 17:27 · sumedh · Crew · topic: spec
+what: retroactive Bugfix spec bug-transfer-limit from the real PVTA counterexample (4107->1053: 4 out / 6 return buses, limit 3)
+kiro: re-ran the pre-fix RAPTOR: a chain-feed Hypothesis property failed and shrank to n=4; pinned it as @example in tests/property/test_transfer_limit.py
+outcome: property fails on pre-fix code, passes on fix; spec in .kiro/specs/bug-transfer-limit/
