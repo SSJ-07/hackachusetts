@@ -68,10 +68,15 @@ def _load_timetable(date: str) -> Timetable:
     return Timetable.from_gtfs_dir(str(PVTA_DIR), date)
 
 
+_TT_CACHE: dict[str, Timetable] = {}  # per-process: a worker reuses its timetable across jobs
+
+
 def _cube_for_day(job: tuple) -> list[dict]:
-    """All cells for one (clinic, day). Top-level so it can run in a worker process."""
-    clinic_id, clinic_stop, visit_type, visit_min, day, date = job
-    tt = _load_timetable(date)
+    """All cells for one (clinic, day, hours). Top-level so it runs in a worker process."""
+    clinic_id, clinic_stop, visit_type, visit_min, day, date, hours = job
+    tt = _TT_CACHE.get(date)
+    if tt is None:
+        tt = _TT_CACHE[date] = _load_timetable(date)
     # Under multi-feed, PVTA ids are prefixed (pvta:1053). Clinic rows may carry a
     # bare id (legacy PVTA) or an agency-prefixed id (frta:...).
     if clinic_stop not in tt.stops and f"pvta:{clinic_stop}" in tt.stops:
@@ -82,7 +87,7 @@ def _cube_for_day(job: tuple) -> list[dict]:
     clinic_ref = (cs.lat, cs.lon)
     origins = pd.read_parquet(ORIGINS)
     rows: list[dict] = []
-    for hour in HOURS:
+    for hour in hours:
         start = hour * 3600
         for o in origins.itertuples(index=False):
             # Authoritative: the engine's round_trip, resolving the block group by
@@ -114,7 +119,9 @@ def build_cube(anchor_date: str, only_clinic: str | None = None, workers: int = 
         visit_type = getattr(c, "visit_type", "") or "primary_care"
         visit_min = int(getattr(c, "visit_minutes", "") or DEFAULT_VISIT_MIN)
         for day in DAYS:
-            jobs.append((c.clinic_id, c.stop_id, visit_type, visit_min, day, _day_to_date(day, anchor_date)))
+            date = _day_to_date(day, anchor_date)
+            for hour in HOURS:  # one job per hour: far more parallelism than per day
+                jobs.append((c.clinic_id, c.stop_id, visit_type, visit_min, day, date, (hour,)))
 
     rows: list[dict] = []
     if workers > 1:
@@ -132,8 +139,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--date", default="2026-11-12", help="anchor date (weekday mapping); inside feed window")
     ap.add_argument("--clinic", default=None, help="build only this clinic_id (other clinics' rows are kept)")
-    ap.add_argument("--workers", type=int, default=min(7, os.cpu_count() or 1),
-                    help="worker processes, one (clinic, day) per job (default: up to 7)")
+    ap.add_argument("--workers", type=int, default=max(1, min(12, (os.cpu_count() or 2) - 2)),
+                    help="worker processes, one (clinic, day, hour) per job (default: up to 12)")
     args = ap.parse_args()
     df = build_cube(args.date, args.clinic, args.workers)
     OUT.parent.mkdir(parents=True, exist_ok=True)

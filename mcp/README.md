@@ -9,7 +9,9 @@ Three custom MCP servers (stdio).
 | `access-resources-mcp` | `rural_options`, `pt1_prefill`, `visit_rules` | resources: rural options table with sources |
 
 Registered in `.kiro/settings/mcp.json` (alongside GitHub, Playwright and AWS Docs).
-All three are **placeholders**: tools return `{"status": "not_implemented", ...}` with the
+`access-resources-mcp` is **real** (spec: `.kiro/specs/access-resources-mcp/`; logic in
+`planner/access.py`, every response carries `source_url` + `vintage`). `gtfs-mcp` and
+`reach-mcp` are still **placeholders**: tools return `{"status": "not_implemented", ...}` with the
 contract shape. Setup (run from repo root):
 
 ```bash
