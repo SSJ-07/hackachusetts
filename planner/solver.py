@@ -209,6 +209,23 @@ def plan_visit(
         ]
     else:
         options = [o for o, _ in attend]
+        # VP-22: a recurring visit (e.g. dialysis 3x/week) is not a one-off. Annotate the
+        # top attend option so the UI/navigator plans the repeating pattern. Logistics
+        # only: we surface the cadence from the rulebook, never a clinical schedule.
+        if rule.recurrence_per_week and options:
+            top = options[0]
+            options[0] = Option(
+                top.kind,
+                top.why,
+                {
+                    **top.details,
+                    "recurrence_per_week": rule.recurrence_per_week,
+                    "recurrence_note": (
+                        f"This visit repeats about {rule.recurrence_per_week}x per week; "
+                        "plan the same trip for each session."
+                    ),
+                },
+            )
         if rule.prep:
             options.append(
                 Option(

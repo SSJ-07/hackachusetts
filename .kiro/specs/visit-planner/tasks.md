@@ -15,10 +15,10 @@
 - [ ] 13. Switch to M3's `pt1_fields.json` and real rulebook values; confirm file shapes with M3. _VP-2, VP-15_
 - [ ] 14. Childcare window: agree a contract change with Sumedh, then add the check + property. _VP-20_
 - [x] 15. Use `cost_worry` / `has_transport` as navigator-facing option flags (fixed kind order unchanged). _VP-21_
-- [ ] 16. Recurrence planning (e.g. dialysis per week). _VP-22_
+- [x] 16. Recurrence annotation on the top option from `recurrence_per_week` (e.g. dialysis per week). _VP-22_
 - [ ] 17. `plan_b` from reviewed templates (M3). _VP-23_
 - [ ] 18. Volunteer-driver windows for rides (M3 data). _VP-24_
-- [ ] 19.* Property: itinerary integrity (`last_bus_home` is truly last; plan B later than plan A, FINAL §8.3 #19). _VP-14, VP-23_
+- [x] 19.* Property: itinerary integrity — `last_bus_home` is truly last (plan B vs A waits on M3 templates, VP-23). _VP-14_
 
 Status: **H6 target met with mocks**. Maria (synthetic) gets an escort-aware ride at 15:30,
 a Spanish prep option and a PT-1 pre-fill using the stubbed router. Open items wait on

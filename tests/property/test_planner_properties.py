@@ -34,6 +34,7 @@ complete_rules = st.builds(
     escort_required=st.booleans(),
     telehealth_ok=st.booleans(),
     prep=st.booleans(),
+    recurrence_per_week=st.none() | st.integers(1, 7),
 )
 # Rulebook entries with nulls (unverified). Kept to roughly 1 in 4 examples.
 unverified_rules = st.builds(
@@ -165,3 +166,32 @@ def test_none_is_alone_and_only_when_nothing_viable(scenario):
     if OptionKind.NONE in kinds:
         assert kinds == [OptionKind.NONE]
     assert kinds  # never an empty plan
+
+
+@given(scenarios())
+def test_p19_itinerary_integrity(scenario):
+    """VP-14: when a slot itinerary is populated, last_bus_home is truly the last
+    return leg (no later return leg exists), and it matches the slot's trip.
+
+    The 'plan B later than plan A' half (FINAL §8.3 #19, VP-23) needs human-reviewed
+    templates (M3); plan_b stays None in mock mode, asserted here so a regression that
+    invents patient-facing text is caught.
+    """
+    plan = run(scenario)
+    it = plan.itinerary
+    if it.out_legs or it.ret_legs:
+        # A populated itinerary comes only from a top SLOT option (VP-14).
+        assert OptionKind.SLOT in {o.kind for o in plan.options}
+        assert it.ret_legs, "a populated itinerary must have a return"
+        last_arr = max(leg.arr for leg in it.ret_legs)
+        # last_bus_home is the latest return departure that still gets home; it can
+        # never be after the journey actually arrives home.
+        assert it.last_bus_home is not None
+        assert it.last_bus_home <= last_arr
+        # No return leg departs after the recorded last bus home.
+        assert all(leg.dep <= it.last_bus_home for leg in it.ret_legs)
+    else:
+        # Empty itinerary carries no legs and no last bus home (VP-14).
+        assert it.last_bus_home is None
+    # plan_b text is template-only (M3); never machine-generated here.
+    assert it.plan_b is None
