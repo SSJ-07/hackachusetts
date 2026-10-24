@@ -60,3 +60,37 @@ outcome: property fails on pre-fix code, passes on fix; spec in .kiro/specs/bug-
 what: Phase B M1: UI properties + Playwright/axe, Suggest panel on GET /suggest, 8 new hooks, 3-job CI, power fresh-workspace test, experiments 3/4, Scorecard, Crew feed crons, Kiro Web issues #8-10
 kiro: Crew ran 5 parallel worker agents on disjoint files; parent verified every file and re-ran all suites; axe hook found 2 serious a11y bugs, power test found the round_trip tool-name bug
 outcome: 396 pytest + 20 vitest + 2 e2e + 2 axe green; uncommitted on sumedh
+
+## 2026-10-24 19:04 · sumedh · Crew · topic: other
+what: M2 handover: Makefile (data/test/test-full/snapshot/demo), 4-clinic cube merge incl. CHCFC Greenfield via FRTA (11.3% reachable), make data builds a cube per clinic_stops.csv row
+kiro: reassigned from M2 (laptop crash); Makefile wires get_data -> pvta extract -> origins -> stops_walk -> bg_towns -> per-clinic cubes -> merge
+outcome: cube.parquet 170,016 cells: Baystate 31.0%, Holyoke 33.4%, Mercy 41.5%, Greenfield 11.3%; snapshot data/snapshots/demo-v1 (45 MB) served by make demo via SLOT_TO_STOP_CACHE_DIR
+
+## 2026-10-24 19:04 · sumedh · Crew · topic: hooks
+what: hooks #1 (feed-expiry-on-session-start, IDE sessionStart UNVERIFIED + CLI agentSpawn verified) and #6 (engine-fast-tests-on-save, fileEdited engine/**) added; README hook table updated
+kiro: CLI agentSpawn hook on slot-to-stop-dev runs check_data_fresh.py; IDE hook reuses the same script
+outcome: 8 IDE .kiro.hook files + 5 CLI agent hooks; scripts unit-tested
+
+## 2026-10-24 19:04 · sumedh · Crew · topic: spec
+what: Rural lens end to end: pipeline/build_towns.py (TIGER COUSUB point-in-polygon, 506 bgs -> 65 towns, 2/279 mismatches vs MassGIS), engine/rural.py, GET /rural, map lens toggle + town filter + text summary, contracts.md section
+kiro: spec-less but contract-first: shapes added to docs/contracts.md and pinned by tests/unit/test_rural_api.py before the UI
+outcome: real data: 320 bgs transit, 86 assisted-only (3,270 car-less adults), 0 none, 100 not_assessed; 7 unit + 1 Hypothesis property; tsc + 20 vitest green
+
+## 2026-10-24 19:04 · sumedh · Crew · topic: pbt
+what: Differential test over the REAL PVTA feed (connection-scan task 6) found a bug in BOTH oracles: CSA and brute force kept one label per stop, which is wrong under a transfer cap (bi-criteria time x buses); RAPTOR was right. Fixed CSA with per-level labels, brute force to settle per (stop, buses, rode_bus)
+kiro: Bugfix spec .kiro/specs/bug-csa-transfer-cap/ with minimal hand-built trap feed; regression test fails on pre-fix code (git stash check) and passes on the fix
+outcome: RAPTOR == CSA on 40 real round trips + 3 full earliest-arrival maps (was 21 lost stops); synthetic differential, golden, transfer-limit, midnight suites green
+
+## 2026-10-24 19:04 · sumedh · Crew · topic: spec
+what: Reviewed M3 multi-feed engine/gtfs.py addition (task 8) and ticked raptor-router 10/11, connection-scan 6, reachability-cube multi-clinic/speedup/FRTA, multi-feed 7b
+kiro: review notes recorded in the multi-feed tasks.md
+outcome: multi-feed unit + property + golden green
+
+## 2026-10-24 19:08 · sumedh · Crew · topic: power
+what: Re-tested slot-to-stop power in a fresh workspace and published it as a public repo + v0.1.0 release
+kiro: Crew ran stdio MCP initialize/tools/list/tools/call against the power's mcp.json, kiro-cli mcp list, then gh repo create + release
+outcome: both servers list tools; validate_feed ok on PVTA; reachability returns cells; github.com/SSJ-07/slot-to-stop-power public
+
+## 2026-10-24 19:10 · sumedh · Crew · topic: other
+what: README Kiro Scorecard refreshed: oracle bug (bug-csa-transfer-cap) under differential testing, 11/11 hooks, 4-clinic cube, /rural contract, current counts (490 fast + 2 slow pytest, 20 vitest, 2 e2e, 2 axe, fresh-clone make data 5 min); mcp/README stale placeholder note fixed
+outcome: write-up text only; no code changed

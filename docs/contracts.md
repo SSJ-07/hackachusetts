@@ -154,7 +154,14 @@ Build a Visit Planner plan. `patient` is synthetic only.
   "visit_type": "colonoscopy",
   "barriers": {
     "has_transport": false, "work_shift": [7, 15], "childcare": false,
-    "has_escort": true, "cost_worry": true, "language": "es"
+    "has_escort": true, "cost_worry": true, "language": "es",
+    // OPTIONAL childcare window (M4, VP-20). When the patient must be home to
+    // care for someone, the plan SHALL NOT recommend a slot/ride whose
+    // door-to-door window (travel included) overlaps this window.
+    // Hours are 24h local; a window may cross midnight (e.g. {start:22,end:6}).
+    // Omit the key when there is no window; `childcare: true` without a window
+    // still flags the need but applies no time constraint.
+    "childcare_window": { "start": 15, "end": 18 }
   }
 }
 // response
@@ -190,6 +197,45 @@ Powers the "How we know this is right" drawer. `id` identifies an on-screen numb
   "spec_link": ".kiro/specs/raptor-router/requirements.md#RT-8"
 }
 ```
+
+### `GET /rural?town` — M1 → UI (rural lens; additive, 2026-10-24)
+The "no option at all" verdict per block group. Reachability comes only from the cube;
+the per-town options come from the hand-collected tables `data/manual/rural_options.csv`
++ `rural_coverage.csv` (M3), joined through `data/cache/bg_towns.parquet`
+(`pipeline/build_towns.py`, TIGER county subdivisions). `town` is optional and
+case-insensitive; unknown town → 404. Mock mode returns an empty, labelled answer.
+
+```jsonc
+{
+  "town": "Rowe",                       // echo of the filter, or null
+  "features": [
+    { "bg_geoid": "250110401001", "town": "Rowe", "county": "Franklin",
+      "lat": 42.69, "lon": -72.92, "carless_adults": 20,
+      "transit_share": 0.0,             // share of ALL cube cells (every clinic × day × hour) reachable
+      "desert": true,                   // no PVTA/FRTA stop within the walk limit
+      "verdict": "none",                // transit | assisted_only | none | not_assessed
+      "coverage_tier": "none" }
+  ],
+  "summary": { "n_bg": 1, "carless_adults": 20,
+               "by_verdict": { "transit": {"n_bg": 0, "carless_adults": 0}, "none": {"n_bg": 1, "carless_adults": 20}, /* ... */ } },
+  "options": [                          // the town's row(s) from the rural tables, cited
+    { "town": "Rowe", "county": "Franklin", "coverage_tier": "none", "has_any_option": false,
+      "dial_a_ride": null, "coa_driver": null, "pt1": null,
+      "source_url": "https://...", "verified_by": "phone", "date": "2026-10-24" }
+  ],
+  "towns_available": ["Agawam", "Amherst", "..."],
+  "sources": [ /* SourceRef[]: cube, ACS, rural tables (vintage = newest row date), TIGER COUSUB 2024 */ ]
+}
+```
+
+Verdict rule: `transit` if any cube cell for the block group is reachable; otherwise
+`not_assessed` if the town is not in the rural table (Hampden towns today); otherwise
+`assisted_only` if `has_any_option` is TRUE, else `none`.
+
+### Serving a frozen snapshot
+`SLOT_TO_STOP_CACHE_DIR=<dir>` redirects every cache path (`cube.parquet`,
+`origins.parquet`, `bg_towns.parquet`, `pvta/`, `manifest.json`). `make snapshot` freezes
+`data/cache/` into `data/snapshots/demo-v1/`; `make demo` serves it in real mode.
 
 ---
 

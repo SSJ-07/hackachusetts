@@ -1,0 +1,9 @@
+{
+  "name": "engine-fast-tests-on-save",
+  "description": "Hook #6. When a file under engine/** is saved in the Kiro IDE, run the fast router suite — property tests (fast Hypothesis profile) + golden PVTA trips + the transfer-limit regression — so a routing regression is caught at edit time. Fires in the Kiro IDE (fileEdited, verified trigger). File hooks fire only on agent/IDE edits, so CI repeats this check (`make test`). Stops at the first failure to keep the loop short.",
+  "trigger": "fileEdited",
+  "matcher": "engine/**",
+  "action": "python -m pytest tests/property tests/golden tests/differential -q -x -m \"not slow\"",
+  "timeout": 300,
+  "enabled": true
+}

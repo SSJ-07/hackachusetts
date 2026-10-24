@@ -25,4 +25,4 @@
   unchanged at 31.1% (PVTA-only number preserved). `make data` must call
   `pipeline/stage_feeds.py` after `get_data.py`; the Greenfield row in `clinic_stops.csv`
   is then built with every other clinic.
-- [ ] 8. M1 review of the `engine/gtfs.py` addition before merge.
+- [x] 8. M1 review of the `engine/gtfs.py` addition (2026-10-24): additive classmethod, single-feed path untouched; agency prefix applied to every id incl. transfer endpoints; cross-agency walk O(|PVTA stops|·|FRTA stops|) ≈ 2k×400, fine; `max(0, min_transfer_time)` clamp is correct (negative times looped the relax). Multi-feed unit + property + golden suites green; real-feed RAPTOR==CSA differential added (`tests/differential/test_real_feed_agree.py`). One note: `routes` are not carried into the merged Timetable — the engine never reads them, so no change needed.
