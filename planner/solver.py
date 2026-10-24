@@ -1,9 +1,11 @@
 """Visit Planner constraint solver (owner: M4). Spec: .kiro/specs/visit-planner/.
 
-Pure function, standard library only: no FastAPI, no Pydantic, no I/O. The transit
-check is injected (`RoundTripFn`, same signature as `engine.round_trip`).
+Pure function: no FastAPI, no Pydantic, no I/O. Uses only the standard library and
+engine.types. The transit check is injected (`RoundTripFn`: `engine.round_trip` with
+its timetable bound).
 
 Hard rules (steering visit-rules.md):
+  R0 unverified rule  -> any null field in the rulebook entry: a single `none` option.
   R1 escort_required  -> never a transit-only option; offer an escort-aware ride.
   R2 shift            -> no recommended slot overlaps the work shift, travel included.
   R3 telehealth_ok    -> a telehealth swap only when the visit type allows it.
@@ -32,7 +34,7 @@ from planner.models import (
     VisitRule,
 )
 from planner.pt1 import Pt1Field, prefill
-from planner.transit import RoundTripFn
+from planner.transit import RoundTripFn, travel_window
 
 SOLVER_VERSION = "0.1.0"
 _DAY = 86_400
@@ -55,6 +57,8 @@ REASONS: dict[str, str] = {
     "Flag for a navigator to call.",
     "none_escort": "An escort-aware ride is needed, but no slot could be checked against the work "
     "shift including travel. Flag for a navigator to call.",
+    "none_rules_unverified": "Logistics rules for this visit type are not verified yet. "
+    "Flag for a navigator to call.",
 }
 
 
@@ -110,7 +114,7 @@ def _check(
     checked = []
     for slot in slots:
         trip = round_trip(patient.origin_bg, slot.clinic_id, slot.date, slot.start, rule.duration_min)
-        window = trip.travel_window
+        window = travel_window(trip)
         conflict = window is not None and overlaps(window, shift)
         checked.append(_Checked(slot, trip, window, conflict))
     return sorted(checked, key=lambda c: c.sort_key)
@@ -134,6 +138,21 @@ def plan_visit(
     round_trip: RoundTripFn,
     pt1_fields: tuple[Pt1Field, ...] = (),
 ) -> Plan:
+    if not rule.is_complete:
+        # R0: unknown (null) rules are never guessed. Without a verified escort rule we
+        # cannot rule out a transit-only plan, so hand off to a navigator.
+        return Plan(
+            options=(
+                Option(
+                    OptionKind.NONE,
+                    REASONS["none_rules_unverified"],
+                    {"navigator_followup": True, "rules_status": rule.source_status},
+                ),
+            ),
+            itinerary=Itinerary(),
+            pt1_prefill={},
+        )
+
     shift = shift_intervals(barriers.work_shift)
     checked = _check(patient, rule, set(candidate_slots), round_trip, shift)
 
@@ -184,8 +203,8 @@ def plan_visit(
     top_slot = next((c for o, c in attend if o.kind is OptionKind.SLOT), None)
     itinerary = (
         Itinerary(
-            out_legs=top_slot.trip.out_legs,
-            ret_legs=top_slot.trip.ret_legs,
+            out_legs=tuple(top_slot.trip.out_legs),
+            ret_legs=tuple(top_slot.trip.ret_legs),
             last_bus_home=top_slot.trip.last_bus_home,
             plan_b=None,  # patient-facing text: waits on reviewed templates (M3)
         )

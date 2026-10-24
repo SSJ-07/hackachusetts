@@ -1,7 +1,8 @@
-"""Plain dataclasses for the Visit Planner (standard library only).
+"""Plain dataclasses for the Visit Planner (standard library + engine types only).
 
-Shapes mirror docs/contracts.md. Times are integer seconds since local midnight of
-the service date and may exceed 86400; they are never wrapped.
+Leg and RoundTripResult are the engine's own types (docs/contracts.md §2), so the
+planner and M1's router share one definition. Times are integer seconds since local
+midnight of the service date and may exceed 86400; they are never wrapped.
 """
 
 from __future__ import annotations
@@ -9,6 +10,21 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
+
+from engine.types import Leg, RoundTripResult
+
+__all__ = [
+    "Barriers",
+    "CandidateSlot",
+    "Itinerary",
+    "Leg",
+    "Option",
+    "OptionKind",
+    "Patient",
+    "Plan",
+    "RoundTripResult",
+    "VisitRule",
+]
 
 
 class OptionKind(str, Enum):
@@ -22,48 +38,27 @@ class OptionKind(str, Enum):
 
 
 # --------------------------------------------------------------------------- #
-# Engine shapes (docs/contracts.md §2).
-# TODO(M1 handoff): import these from engine/ once it exports them.
-# --------------------------------------------------------------------------- #
-@dataclass(frozen=True)
-class Leg:
-    kind: str  # "walk" | "bus"
-    from_stop: str  # stop_id or "origin"/"clinic"
-    to_stop: str
-    route_id: str | None
-    dep: int
-    arr: int
-
-
-@dataclass(frozen=True)
-class RoundTripResult:
-    reachable: bool
-    out_legs: tuple[Leg, ...] = ()
-    ret_legs: tuple[Leg, ...] = ()
-    last_bus_home: int | None = None
-    reason: str = ""
-
-    @property
-    def travel_window(self) -> tuple[int, int] | None:
-        """(leave home, arrive home) in seconds, or None if not a complete round trip."""
-        if not (self.reachable and self.out_legs and self.ret_legs):
-            return None
-        return self.out_legs[0].dep, self.ret_legs[-1].arr
-
-
-# --------------------------------------------------------------------------- #
 # Planner inputs
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
 class VisitRule:
-    """One visit type from planner/visit_rules.yaml (M3). See steering visit-rules.md."""
+    """One visit type from planner/visit_rules.yaml (M3). See steering visit-rules.md.
+
+    None means "not verified yet" and is never read as 0 or false.
+    """
 
     visit_type: str
-    duration_min: int
-    escort_required: bool
-    telehealth_ok: bool
-    prep: bool
-    recurrence: str | None = None
+    duration_min: int | None
+    escort_required: bool | None
+    telehealth_ok: bool | None
+    prep: bool | None
+    recurrence_per_week: int | None = None
+    source_status: str = "todo"
+
+    @property
+    def is_complete(self) -> bool:
+        """True when every field the solver needs has a value."""
+        return None not in (self.duration_min, self.escort_required, self.telehealth_ok, self.prep)
 
 
 @dataclass(frozen=True)

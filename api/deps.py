@@ -97,6 +97,7 @@ def get_candidate_slot_source() -> CandidateSlotSource:
 
 def get_round_trip() -> RoundTripFn:
     if data_mode() == "real":
-        # TODO(M1 handoff): return engine.round_trip.
+        # TODO(M1 handoff): return functools.partial(engine.round_trip, timetable) once a
+        # PVTA timetable + data/cache/stops_walk.parquet are available.
         raise _unavailable("Routing engine (engine.round_trip, M1)")
     return FixtureRoundTrip.from_records(mocks.load("planner/round_trips.json")["records"])

@@ -1,11 +1,18 @@
-# MOCK rulebook for the H1 API demo only. NOT M3's reviewed planner/visit_rules.yaml.
+# MOCK rulebook for the H1 API demo only. NOT M3's planner/visit_rules.yaml.
+# Same schema as planner/visit_rules.yaml (schema_version 1).
 # - escort_required / telehealth_ok / prep for colonoscopy follow .kiro/steering/visit-rules.md
 #   (sedation needs an escort; procedures are not telehealth; bowel prep sheet).
 # - duration 120 is illustrative, from final_plan/FINAL-slot-to-stop.md section 3.1
 #   ("GI ~ 2h including prep and recovery"). Not a sourced value.
+schema_version: 1
+status: mock
+
 visit_types:
   colonoscopy:
+    label: { en: "MOCK colonoscopy", es: null }
     duration: 120
     escort_required: true
     telehealth_ok: false
     prep: true
+    recurrence: null
+    source: { name: "MOCK (illustrative, not sourced)", url: null, vintage: null, status: todo }

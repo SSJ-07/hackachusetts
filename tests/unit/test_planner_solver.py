@@ -93,6 +93,17 @@ def test_telehealth_offered_only_when_allowed():
     assert OptionKind.TELE not in kinds(plan_visit(PATIENT, TRANSIT_RULE, barriers(), [s], rt))
 
 
+@pytest.mark.parametrize("field", ["duration_min", "escort_required", "telehealth_ok", "prep"])
+def test_unverified_rule_hands_off_to_navigator(field):
+    from dataclasses import replace
+
+    rule = replace(TRANSIT_RULE, **{field: None})
+    s = slot(16)
+    plan = plan_visit(PATIENT, rule, barriers(), [s], round_trips({s: trip(15, 18)}))
+    assert kinds(plan) == [OptionKind.NONE]
+    assert plan.options[0].why == REASONS["none_rules_unverified"]
+
+
 def test_no_candidates_gives_single_none_and_no_prep():
     plan = plan_visit(PATIENT, ESCORT_RULE, barriers(), [], round_trips({}))
     assert kinds(plan) == [OptionKind.NONE]

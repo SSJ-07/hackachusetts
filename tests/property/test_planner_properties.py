@@ -17,7 +17,7 @@ from planner.guardrails import find_banned, iter_strings
 from planner.models import Barriers, CandidateSlot, Leg, OptionKind, Patient, RoundTripResult, VisitRule
 from planner.pt1 import SOURCE_KEYS, Pt1Field
 from planner.solver import plan_visit, slot_iso
-from planner.transit import FixtureRoundTrip
+from planner.transit import FixtureRoundTrip, travel_window
 
 MIN = 60
 DAY = 86_400
@@ -27,7 +27,7 @@ PATIENT = Patient(id="synthetic-p", origin_bg=ORIGIN, lang="es")
 settings.register_profile("planner", deadline=None, max_examples=200)
 settings.load_profile("planner")
 
-rules = st.builds(
+complete_rules = st.builds(
     VisitRule,
     visit_type=st.sampled_from(["type-a", "type-b", "type-c"]),
     duration_min=st.integers(1, 300),
@@ -35,6 +35,16 @@ rules = st.builds(
     telehealth_ok=st.booleans(),
     prep=st.booleans(),
 )
+# Rulebook entries with nulls (unverified). Kept to roughly 1 in 4 examples.
+unverified_rules = st.builds(
+    VisitRule,
+    visit_type=st.sampled_from(["type-a", "type-b", "type-c"]),
+    duration_min=st.none() | st.integers(1, 300),
+    escort_required=st.none() | st.booleans(),
+    telehealth_ok=st.none() | st.booleans(),
+    prep=st.none(),
+)
+rules = st.one_of(complete_rules, complete_rules, complete_rules, unverified_rules)
 shifts = st.none() | st.tuples(st.integers(0, 24), st.integers(0, 24))
 barrier_sets = st.builds(
     Barriers,
@@ -99,7 +109,7 @@ def run(scenario):
 def test_p15_escort_never_transit_only(scenario):
     rule = scenario[0]
     plan = run(scenario)
-    if rule.escort_required:
+    if rule.escort_required is not False:  # True or unknown: never transit-only
         assert OptionKind.SLOT not in {o.kind for o in plan.options}
         assert plan.itinerary.out_legs == () and plan.itinerary.ret_legs == ()
 
@@ -113,7 +123,7 @@ def test_p16_no_recommended_slot_overlaps_shift(scenario):
             continue
         s = by_iso[(option.details["slot"], option.details["clinic_id"])]
         result = table[(ORIGIN, s.clinic_id, s.date, s.start)]
-        window = result.travel_window
+        window = travel_window(result)
         if window is None:
             assert option.kind is OptionKind.RIDE and not barriers.work_shift_has_hours() if hasattr(
                 barriers, "work_shift_has_hours"
@@ -127,7 +137,7 @@ def test_p16_no_recommended_slot_overlaps_shift(scenario):
 def test_p17_telehealth_only_if_allowed(scenario):
     rule = scenario[0]
     if OptionKind.TELE in {o.kind for o in run(scenario).options}:
-        assert rule.telehealth_ok
+        assert rule.telehealth_ok is True
 
 
 @given(scenarios())

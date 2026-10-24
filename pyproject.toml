@@ -31,9 +31,4 @@ include = ["api*", "planner*"]
 [tool.setuptools.package-data]
 api = ["mocks/*.json", "mocks/planner/*"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-# "mcp" lets tests import access_resources_mcp without a top-level mcp package
-# (which would shadow the MCP SDK).
-pythonpath = [".", "mcp"]
-addopts = "-ra --strict-markers --import-mode=importlib"
+# pytest is configured in pytest.ini (M1), which takes precedence over this file.
