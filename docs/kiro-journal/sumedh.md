@@ -94,3 +94,12 @@ outcome: both servers list tools; validate_feed ok on PVTA; reachability returns
 ## 2026-10-24 19:10 · sumedh · Crew · topic: other
 what: README Kiro Scorecard refreshed: oracle bug (bug-csa-transfer-cap) under differential testing, 11/11 hooks, 4-clinic cube, /rural contract, current counts (490 fast + 2 slow pytest, 20 vitest, 2 e2e, 2 axe, fresh-clone make data 5 min); mcp/README stale placeholder note fixed
 outcome: write-up text only; no code changed
+
+## 2026-10-24 19:43 · sumedh · Crew · topic: pbt
+what: Demo bring-up found the planner always answered 'none' for Maria on real data: (1) colonoscopy slots only existed for BAY_GI_GREENFIELD, which has no stop anchor; (2) the UI's synthetic origin was not a real block group; (3) engine.round_trip returned the EARLIEST outbound (06:xx for a 16:30 visit), so the door-to-door window overlapped every shift
+kiro: fixed in order: 66 labelled template slots for BAY_GI_SPRINGFIELD (demo anchor), Maria -> Holyoke bg 250138121032 (real + mocks), round_trip now returns the latest-departing outbound via the reverse profile; new property test_latest_outbound.py
+outcome: Maria: escort-aware ride at 16:30 + ES prep sheet + PT-1 prefill on real PVTA data; fast suite + 11 e2e + axe green
+
+## 2026-10-24 19:43 · sumedh · Crew · topic: other
+what: Demo plumbing: CORS middleware (origins from SLOT_TO_STOP_WEB_ORIGINS), planner slot window [today, +14d] frozen by SLOT_TO_STOP_TODAY in make demo, PlanView shows top 3 options + show-more; merged #14 after fixing a count() race in Kevin's planner e2e
+outcome: localhost demo: API :8000 real mode on the frozen snapshot, web :5173 via /api proxy

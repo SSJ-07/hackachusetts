@@ -8,6 +8,9 @@
 PYTHON ?= python
 SNAPSHOT ?= data/snapshots/demo-v1
 CUBE_DATE ?= 2026-11-12
+# Frozen "today" for the frozen snapshot: the demo slots in clinic_schedules.csv cover
+# 2026-10-10..11-10, so the planner's [today, today+14d] window must sit inside that.
+DEMO_TODAY ?= 2026-10-26
 # Clinic ids come from the manual clinic table, so a new clinic row is picked up
 # automatically by `make data` — nobody has to hand-list clinics here.
 CLINICS := $(shell tail -n +2 data/manual/clinic_stops.csv | cut -d, -f1)
@@ -89,7 +92,7 @@ snapshot:
 
 demo:
 	@test -f $(SNAPSHOT)/cube.parquet || { echo "no snapshot at $(SNAPSHOT): run 'make snapshot' (or 'make data' first)"; exit 1; }
-	SLOT_TO_STOP_DATA=real SLOT_TO_STOP_CACHE_DIR=$(SNAPSHOT) \
+	SLOT_TO_STOP_DATA=real SLOT_TO_STOP_CACHE_DIR=$(SNAPSHOT) SLOT_TO_STOP_TODAY=$(DEMO_TODAY) \
 	  $(PYTHON) -m uvicorn api.main:app --port 8000
 
 clean-cache:

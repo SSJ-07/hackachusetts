@@ -188,7 +188,9 @@
         "none": "Necesita un navegante"
       },
       "recommended": "Mejor opción",
-      "recurrence": "Esta visita se repite unas {{count}} veces por semana. Planee el mismo viaje cada vez."
+      "recurrence": "Esta visita se repite unas {{count}} veces por semana. Planee el mismo viaje cada vez.",
+      "showMore": "Mostrar {{n}} opciones más",
+      "showLess": "Mostrar menos opciones"
     },
     "itinerary": {
       "title": "Su viaje",

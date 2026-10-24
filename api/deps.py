@@ -186,6 +186,20 @@ def get_pt1_fields() -> tuple[Pt1Field, ...]:
         raise _unavailable("PT-1 field list") from exc
 
 
+def _slot_window() -> tuple[str, str]:
+    """[today, today + SLOT_TO_STOP_SLOT_HORIZON_DAYS] as ISO dates.
+
+    SLOT_TO_STOP_TODAY freezes "today" so a frozen demo snapshot (whose slots were
+    generated for a fixed date range) keeps answering the same way; `make demo` sets it.
+    """
+    import datetime as _dt
+
+    today_s = os.environ.get("SLOT_TO_STOP_TODAY", "").strip()
+    today = _dt.date.fromisoformat(today_s) if today_s else _dt.date.today()
+    days = int(os.environ.get("SLOT_TO_STOP_SLOT_HORIZON_DAYS", "14"))
+    return today.isoformat(), (today + _dt.timedelta(days=days)).isoformat()
+
+
 def get_candidate_slot_source() -> CandidateSlotSource:
     if data_mode() == "real":
         # Real mode: demo/illustrative slots from data/manual/clinic_schedules.csv (M3).
@@ -195,8 +209,12 @@ def get_candidate_slot_source() -> CandidateSlotSource:
         except ClinicScheduleError as exc:
             raise _unavailable("Clinic schedules (data/manual/clinic_schedules.csv, M3)") from exc
 
+        today, horizon = _slot_window()
+
         def real_source(rule: VisitRule) -> list[CandidateSlot]:
-            return slots_for_rule(scheduled, rule)
+            # Only slots from today through today + horizon: a past date is not an option,
+            # and a navigator books within a short window. Both ends are dates, no times.
+            return [s for s in slots_for_rule(scheduled, rule) if today <= s.date <= horizon]
 
         return real_source
     by_type = mocks.load("planner/candidate_slots.json")["slots"]

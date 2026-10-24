@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { PlanLeg, PlanResponse, OptionKind } from "../api/types";
 import { ProvenanceChip } from "./ProvenanceChip";
@@ -44,13 +45,19 @@ export function PlanView({ plan }: { plan: PlanResponse }) {
   const it = plan.itinerary;
   const hasItinerary = it.out_legs.length > 0 || it.ret_legs.length > 0;
   const pt1Entries = Object.entries(plan.pt1_prefill ?? {});
+  // Real data can return one ride per bookable date; show the top few, keep the rest
+  // one click away (ranking is the solver's, the UI never reorders).
+  const SHOW = 3;
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? plan.options : plan.options.slice(0, SHOW);
+  const hidden = plan.options.length - visible.length;
 
   return (
     <section aria-labelledby="plan-heading" className="plan-view">
       <h2 id="plan-heading">{t("planner.plan.heading")}</h2>
 
       <ol className="option-list">
-        {plan.options.map((o, idx) => {
+        {visible.map((o, idx) => {
           const rec =
             (o.details?.recurrence as { per_week?: number } | undefined) ?? null;
           return (
@@ -81,6 +88,18 @@ export function PlanView({ plan }: { plan: PlanResponse }) {
           );
         })}
       </ol>
+      {plan.options.length > SHOW && (
+        <button
+          type="button"
+          className="show-more"
+          aria-expanded={showAll}
+          onClick={() => setShowAll((v) => !v)}
+        >
+          {showAll
+            ? t("planner.plan.showLess")
+            : t("planner.plan.showMore", { n: hidden })}
+        </button>
+      )}
 
       {/* Itinerary */}
       <section aria-labelledby="itin-heading" className="itinerary">

@@ -5,7 +5,10 @@ Run from the repo root:  make api   (or: python -m uvicorn api.main:app --reload
 
 from __future__ import annotations
 
+import os
+
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 from api import __version__
 from api.deps import data_mode
@@ -23,6 +26,13 @@ def create_app() -> FastAPI:
             f"Data mode: {mode}."
         ),
     )
+
+    # The web app runs on another origin (Vite :5173 in dev, Netlify in prod). Allow only
+    # the origins we name; override with a comma-separated SLOT_TO_STOP_WEB_ORIGINS.
+    origins = [o.strip() for o in os.environ.get(
+        "SLOT_TO_STOP_WEB_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173").split(",") if o.strip()]
+    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"],
+                       allow_headers=["Content-Type"])
 
     @app.middleware("http")
     async def tag_data_mode(request: Request, call_next):

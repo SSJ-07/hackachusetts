@@ -188,7 +188,9 @@
         "none": "Needs a navigator"
       },
       "recommended": "Best choice",
-      "recurrence": "This visit repeats about {{count}} times a week. Plan the same trip each time."
+      "recurrence": "This visit repeats about {{count}} times a week. Plan the same trip each time.",
+      "showMore": "Show {{n}} more options",
+      "showLess": "Show fewer options"
     },
     "itinerary": {
       "title": "Your trip",
