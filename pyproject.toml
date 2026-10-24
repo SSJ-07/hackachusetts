@@ -29,6 +29,7 @@ pipeline = [
     "pandas",
     "numpy",
     "pyarrow",
+    "pyshp",  # build_origins.py reads TIGER block-group shapefiles
 ]
 
 [tool.setuptools.packages.find]
