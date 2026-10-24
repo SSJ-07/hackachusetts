@@ -48,3 +48,29 @@ The layer lists EJ block groups only, so any GEOID absent from it is `False`.
 TIGER interior point (`INTPTLAT` / `INTPTLON`), a point guaranteed to fall inside the
 block-group polygon. This is an honest substitute for a true population-weighted
 centroid, which would require areal interpolation against population rasters.
+
+## stops_walk.parquet (pipeline/stops_walk.py)
+
+Sources:
+- **origins.parquet** (block-group points) — from build_origins.py
+- **PVTA GTFS** `stops.txt` — `data/raw/pvta_gtfs.zip`
+
+For each block-group origin, we find every PVTA stop within 800 m straight-line and
+estimate the walk time:
+
+```
+distance_m = haversine(origin_lat, origin_lon, stop_lat, stop_lon)
+keep if distance_m <= 800
+walk_min   = distance_m × 1.3 (detour factor) / 80 (metres per minute, ~4.8 km/h)
+```
+
+Only real boarding stops are kept (GTFS `location_type` 0 or blank; stations and
+entrances are skipped).
+
+### Transit-desert note (a finding, not a bug)
+193 of 506 block groups have **no** PVTA stop within 800 m. By county:
+Hampden 249/336 served, Hampshire 59/108, Franklin **5/62**. Franklin County is almost
+entirely unserved by fixed-route transit, which is the evidence behind the product's
+rural "no option at all" layer.
+
+The straight-line × 1.3 detour is an MVP substitute for a true OSM walk network.
