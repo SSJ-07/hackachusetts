@@ -1,0 +1,20 @@
+# visit_weights.yaml — priority weight w(visit_type) for the schedule optimizer.
+#
+# The optimizer objective weights each reachable car-less EJ adult by the
+# clinical priority of the visit type (optimizer-notes.md: colonoscopy
+# follow-up, prenatal and dialysis weigh more). These are RELATIVE logistics
+# priorities for coverage ranking only — NOT clinical guidance.
+#
+# GUARDRAIL (AGENTS.md): every number carries a source. These weights are
+# ILLUSTRATIVE placeholders, not sourced from a clinical authority. They must
+# be replaced with team/clinic-sourced values before any real-world use, and
+# any output built on them is labelled illustrative.
+
+source: "illustrative — placeholder priorities, not clinically sourced; replace with team/clinic input"
+vintage: "2026-10-24"
+default: 1.0            # any visit_type not listed below
+weights:
+  colonoscopy: 1.5     # procedure + bowel-prep logistics; missed slot is costly to rebook
+  prenatal: 1.5        # time-sensitive recurring schedule
+  dialysis: 2.0        # life-sustaining, multiple visits per week
+  chemo: 2.0           # time-sensitive recurring schedule

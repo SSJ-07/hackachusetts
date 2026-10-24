@@ -1,0 +1,72 @@
+/* Design tokens (ui-style.md). Components use these variables only. */
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f5f6f8;
+  --surface-2: #e9ecf1;
+  --text: #16181d;          /* 17.6:1 on --bg */
+  --text-muted: #4a5160;    /* 8.0:1 on --bg */
+  --border: #8a93a3;        /* 3.2:1 on --bg (UI component contrast) */
+  --focus-ring: #0b57d0;
+  --link: #0b57d0;
+  --danger: #b3261e;
+  --ok: #146c2e;
+  --warn: #7a4f00;
+  --desert-stroke: #000000;
+
+  /* 5-step viridis (colour-blind safe), low -> high reachable share */
+  --scale-0: #440154;
+  --scale-1: #3b528b;
+  --scale-2: #21918c;
+  --scale-3: #5ec962;
+  --scale-4: #fde725;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --radius: 0.375rem;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fs-1: 0.875rem;
+  --fs-2: 1rem;
+  --fs-3: 1.125rem;
+  --fs-4: 1.375rem;
+  --fs-5: 1.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111318;
+    --surface: #1b1e25;
+    --surface-2: #262a33;
+    --text: #eef0f4;        /* 16.3:1 on --bg */
+    --text-muted: #b7bdc9;  /* 9.6:1 on --bg */
+    --border: #7d8696;      /* 4.6:1 on --bg */
+    --focus-ring: #8ab4f8;
+    --link: #8ab4f8;
+    --danger: #f2b8b5;
+    --ok: #8fd19e;
+    --warn: #f3c46b;
+    --desert-stroke: #ffffff;
+  }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111318;
+  --surface: #1b1e25;
+  --surface-2: #262a33;
+  --text: #eef0f4;
+  --text-muted: #b7bdc9;
+  --border: #7d8696;
+  --focus-ring: #8ab4f8;
+  --link: #8ab4f8;
+  --danger: #f2b8b5;
+  --ok: #8fd19e;
+  --warn: #f3c46b;
+  --desert-stroke: #ffffff;
+}

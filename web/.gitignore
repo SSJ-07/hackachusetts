@@ -1,0 +1,9 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Generated map data (web/scripts/export_origins.py from the gitignored parquet).
+public/data/
+openapi.json
