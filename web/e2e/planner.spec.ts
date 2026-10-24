@@ -129,6 +129,8 @@ test("every option shows a reason (UP-P2)", async ({ page }) => {
   await page.goto("/#/planner");
   await runBarrierCheck(page);
   const reasons = page.locator(".option .option-why");
+  // count() does not auto-wait: let the first option render before counting.
+  await expect(reasons.first()).toBeVisible();
   const count = await reasons.count();
   expect(count).toBeGreaterThan(0);
   for (let i = 0; i < count; i++) {
