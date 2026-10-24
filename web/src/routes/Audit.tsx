@@ -1,0 +1,258 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ApiError,
+  getAudit,
+  getClinics,
+  postWhatIf,
+} from "../api/client";
+import type { AuditResponse, Clinic, Day } from "../api/types";
+import { DAYS, blockKey, deltaPts, hourLabel, pct } from "../lib/scale";
+import { WeekGrid } from "../components/WeekGrid";
+import { DayRibbon } from "../components/DayRibbon";
+import { EquityPanel } from "../components/EquityPanel";
+import { BlockGroupMap } from "../components/BlockGroupMap";
+import { SourcesFooter } from "../components/SourcesFooter";
+import { ScaleLegend } from "../components/ScaleLegend";
+
+type Load =
+  | { kind: "loading" }
+  | { kind: "error"; message: string }
+  | { kind: "ready"; data: AuditResponse };
+
+// Communities the audit can scope to. "all" is the whole service area; the
+// others map to engine.audit.filter_community. Kept here (not an API call) so
+// the picker works before any audit loads.
+const COMMUNITIES = ["all", "ej", "lep", "age65", "zero_veh"] as const;
+
+export function Audit() {
+  const { t } = useTranslation();
+
+  const [clinics, setClinics] = useState<Clinic[] | null>(null);
+  const [clinic, setClinic] = useState<string>("");
+  const [community, setCommunity] = useState<string>("all");
+  const [day, setDay] = useState<Day>("mon");
+
+  const [load, setLoad] = useState<Load>({ kind: "loading" });
+  const [busy, setBusy] = useState(false);
+  const [focusDay, setFocusDay] = useState<Day>("mon");
+  const [announce, setAnnounce] = useState("");
+  // before/after share for the moved block, shown after a what-if
+  const [lastMove, setLastMove] = useState<{
+    block: string;
+    before: number;
+    after: number;
+  } | null>(null);
+
+  const shareOfBlock = useCallback(
+    (data: AuditResponse | undefined, block: string): number | null => {
+      if (!data) return null;
+      const cell = data.cells.find((c) => blockKey(c.day, c.hour) === block);
+      return cell ? cell.share : null;
+    },
+    [],
+  );
+
+  // Load clinics once.
+  useEffect(() => {
+    const ac = new AbortController();
+    getClinics(ac.signal)
+      .then((r) => {
+        setClinics(r.clinics);
+        if (r.clinics.length > 0) setClinic(r.clinics[0].clinic_id);
+      })
+      .catch(() => setClinics([]));
+    return () => ac.abort();
+  }, []);
+
+  // Load the audit whenever clinic/community/day change.
+  useEffect(() => {
+    if (!clinic) return;
+    const ac = new AbortController();
+    setLoad({ kind: "loading" });
+    setLastMove(null);
+    getAudit({ clinic, community, day }, ac.signal)
+      .then((data) => setLoad({ kind: "ready", data }))
+      .catch((err: unknown) => {
+        if (ac.signal.aborted) return;
+        const message =
+          err instanceof ApiError ? err.message : t("audit.error");
+        setLoad({ kind: "error", message });
+      });
+    return () => ac.abort();
+  }, [clinic, community, day, t]);
+
+  const data = load.kind === "ready" ? load.data : undefined;
+
+  const onMove = useCallback(
+    (block: string, toHour: number) => {
+      if (!clinic || busy) return;
+      const before = shareOfBlock(data, block) ?? 0;
+      setBusy(true);
+      setAnnounce(t("audit.whatif.moving"));
+      const ac = new AbortController();
+      postWhatIf({ clinic, shift: { block, to: toHour } }, ac.signal)
+        .then((next) => {
+          setLoad({ kind: "ready", data: next });
+          const movedTo = blockKey(block.slice(0, 3) as Day, toHour);
+          const after = shareOfBlock(next, movedTo) ?? 0;
+          setLastMove({ block: movedTo, before, after });
+          const dayName = t(`audit.days.${block.slice(0, 3) as Day}`);
+          setAnnounce(
+            t("audit.whatif.dropped", { day: dayName, hour: hourLabel(toHour) }),
+          );
+        })
+        .catch((err: unknown) => {
+          const message =
+            err instanceof ApiError ? err.message : t("audit.error");
+          setLoad({ kind: "error", message });
+        })
+        .finally(() => setBusy(false));
+    },
+    [clinic, busy, data, shareOfBlock, t],
+  );
+
+  const liveRef = useRef<HTMLParagraphElement | null>(null);
+
+  const clinicOptions = useMemo(
+    () =>
+      (clinics ?? []).map((c) => (
+        <option key={c.clinic_id} value={c.clinic_id}>
+          {c.clinic_name} · {c.visit_type}
+        </option>
+      )),
+    [clinics],
+  );
+
+  return (
+    <>
+      <h1>{t("audit.title")}</h1>
+      <p>{t("audit.intro")}</p>
+
+      <div className="controls">
+        <div className="field">
+          <label htmlFor="clinic-select">{t("audit.clinic")}</label>
+          <select
+            id="clinic-select"
+            value={clinic}
+            onChange={(e) => setClinic(e.target.value)}
+          >
+            {clinics == null ? (
+              <option>{t("audit.loading")}</option>
+            ) : (
+              clinicOptions
+            )}
+          </select>
+        </div>
+
+        <div className="field">
+          <label htmlFor="community-select">{t("audit.community")}</label>
+          <select
+            id="community-select"
+            value={community}
+            onChange={(e) => setCommunity(e.target.value)}
+          >
+            {COMMUNITIES.map((c) => (
+              <option key={c} value={c}>
+                {c === "all" ? t("legend.title") : t(`equity.groups.${c}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="field">
+          <label htmlFor="day-select">{t("audit.day")}</label>
+          <select
+            id="day-select"
+            value={day}
+            onChange={(e) => setDay(e.target.value as Day)}
+          >
+            {DAYS.map((d) => (
+              <option key={d} value={d}>
+                {t(`audit.days.${d}`)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <p id="grid-help" className="text-muted">
+        {t("audit.pickUpHint")}
+      </p>
+
+      {/* aria-live region for what-if updates (accessibility.md) */}
+      <p
+        ref={liveRef}
+        className="visually-hidden"
+        aria-live="polite"
+        role="status"
+      >
+        {announce}
+      </p>
+
+      {load.kind === "error" && (
+        <div className="status error" role="alert">
+          {load.message}{" "}
+          <button type="button" onClick={() => setDay((d) => d)}>
+            {t("audit.retry")}
+          </button>
+        </div>
+      )}
+
+      {load.kind === "loading" && (
+        <div className="status" role="status">
+          {t("audit.loading")}
+        </div>
+      )}
+
+      {load.kind === "ready" && load.data.cells.length === 0 && (
+        <div className="status" role="status">
+          {t("audit.empty")}
+        </div>
+      )}
+
+      {data && data.cells.length > 0 && (
+        <>
+          <ScaleLegend />
+
+          {lastMove && (
+            <div className="beforeafter" role="status">
+              <strong>{t("audit.whatif.movedTitle")}:</strong>
+              <span>
+                {t("audit.whatif.before")} {pct(lastMove.before)}
+              </span>
+              <span aria-hidden="true">→</span>
+              <span>
+                {t("audit.whatif.after")} {pct(lastMove.after)}
+              </span>
+              <span
+                className={`delta ${
+                  lastMove.after >= lastMove.before ? "up" : "down"
+                }`}
+              >
+                {t("audit.whatif.change")}{" "}
+                {deltaPts(lastMove.before, lastMove.after)} pts
+              </span>
+            </div>
+          )}
+
+          <WeekGrid
+            cells={data.cells}
+            busy={busy}
+            pickedBlock={null}
+            onCellFocus={(d) => setFocusDay(d)}
+            onMove={onMove}
+          />
+
+          <div className="panels">
+            <DayRibbon day={focusDay} cells={data.cells} />
+            <EquityPanel equity={data.equity} />
+            <BlockGroupMap />
+          </div>
+
+          <SourcesFooter sources={data.sources} />
+        </>
+      )}
+    </>
+  );
+}

@@ -9,11 +9,13 @@ Tests override these dependencies with their own synthetic fixtures.
 
 from __future__ import annotations
 
+import functools
 import json
 import os
 from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from fastapi import HTTPException, status
 
@@ -23,6 +25,9 @@ from planner.pt1 import Pt1Field, Pt1FieldsError, load_fields, load_fields_inven
 from planner.rules import RulebookError, load_rules
 from planner.slots import ClinicScheduleError, load_slots, slots_for_rule
 from planner.transit import FixtureRoundTrip, RoundTripFn, TimetableRoundTrip
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REAL_RULES_PATH = REPO_ROOT / "planner" / "visit_rules.yaml"
@@ -51,10 +56,40 @@ def _unavailable(what: str) -> HTTPException:
 # --------------------------------------------------------------------------- #
 # /audit, /whatif (M2)
 # --------------------------------------------------------------------------- #
-def get_audit_data() -> dict[str, Any]:
+@dataclass(frozen=True)
+class AuditSource:
+    """What /audit and /whatif read from.
+
+    mock mode : `payload` is the ready-made audit dict (api/mocks/audit.json);
+                routers return it verbatim (stamped with the requested day).
+    real mode : `cube` and `origins` are the DataFrames engine.audit aggregates;
+                routers call engine.audit.audit(...) / whatif(...) per request.
+    """
+
+    mode: DataMode
+    payload: dict[str, Any] | None = None
+    cube: "pd.DataFrame | None" = None
+    origins: "pd.DataFrame | None" = None
+
+
+@functools.lru_cache(maxsize=1)
+def _load_cube_origins() -> tuple["pd.DataFrame", "pd.DataFrame"]:
+    """Load + cache the real cube and origins. Cache lives for the process."""
+    from engine import audit as engine_audit
+
+    if not engine_audit.CUBE_PATH.is_file() or not engine_audit.ORIGINS_PATH.is_file():
+        raise FileNotFoundError  # translated to 503 by the caller
+    return engine_audit.load_cube(), engine_audit.load_origins()
+
+
+def get_audit_data() -> AuditSource:
     if data_mode() == "mock":
-        return mocks.load("audit.json")
-    raise _unavailable("Reachability cube (M2)")
+        return AuditSource(mode="mock", payload=mocks.load("audit.json"))
+    try:
+        cube, origins = _load_cube_origins()
+    except (FileNotFoundError, OSError) as exc:
+        raise _unavailable("Reachability cube (data/cache/cube.parquet, M2)") from exc
+    return AuditSource(mode="real", cube=cube, origins=origins)
 
 
 # --------------------------------------------------------------------------- #

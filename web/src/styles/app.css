@@ -1,0 +1,326 @@
+/* App styles — tokens only, no literal hex (ui-style.md). */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-2);
+  line-height: 1.5;
+}
+
+h1 {
+  font-size: var(--fs-5);
+  line-height: 1.2;
+  margin: 0 0 var(--space-3);
+}
+h2 {
+  font-size: var(--fs-4);
+  margin: var(--space-5) 0 var(--space-2);
+}
+h3 {
+  font-size: var(--fs-3);
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+a {
+  color: var(--link);
+}
+
+/* Visible focus on EVERY focusable element (accessibility.md 2.4.7/2.4.11). */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Skip-to-content link: hidden until focused. */
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: calc(-1 * var(--space-6) - var(--space-4));
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  z-index: 50;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+.app-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.app-header .brand {
+  font-weight: 700;
+  font-size: var(--fs-3);
+}
+.app-nav {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.app-nav a {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+.app-nav a[aria-current="page"] {
+  background: var(--surface-2);
+  font-weight: 600;
+}
+.app-main {
+  padding: var(--space-4);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.lang-switch {
+  margin-left: auto;
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: var(--space-4);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 12rem;
+}
+.field label {
+  font-size: var(--fs-1);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+select,
+button,
+input {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  min-height: 2.25rem;
+}
+button {
+  cursor: pointer;
+  background: var(--surface-2);
+}
+button[aria-pressed="true"] {
+  background: var(--focus-ring);
+  color: #fff;
+  border-color: var(--focus-ring);
+}
+
+/* Status (loading/empty/error) */
+.status {
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.status.error {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.notice {
+  padding: var(--space-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+/* Week grid */
+.weekgrid {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: var(--fs-1);
+}
+.weekgrid caption {
+  text-align: left;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+.weekgrid th,
+.weekgrid td {
+  border: 1px solid var(--border);
+  padding: 0;
+  text-align: center;
+}
+.weekgrid th {
+  background: var(--surface);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fs-1);
+}
+.cell-btn {
+  width: 100%;
+  min-width: 2.5rem;
+  min-height: 2.25rem;
+  border: none;
+  border-radius: 0;
+  background: var(--cell-bg, var(--scale-na));
+  color: var(--cell-ink, var(--scale-na-ink));
+  font-variant-numeric: tabular-nums;
+  padding: var(--space-1);
+}
+.cell-btn:focus-visible {
+  outline-offset: -3px;
+}
+.cell-btn[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 3px var(--focus-ring);
+}
+.cell-btn.picked {
+  box-shadow: inset 0 0 0 3px var(--warn);
+}
+
+/* Scale legend */
+.legend {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin: var(--space-3) 0;
+  font-size: var(--fs-1);
+}
+.legend .swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.legend .box {
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--border);
+  display: inline-block;
+}
+
+/* Panels */
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  background: var(--surface);
+}
+.equity-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.equity-row:last-child {
+  border-bottom: none;
+}
+
+/* Provenance chip */
+.chip {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  font-size: var(--fs-1);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px var(--space-2);
+  background: var(--bg);
+  color: var(--text-muted);
+}
+
+/* Sources footer */
+.sources {
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-3);
+  font-size: var(--fs-1);
+  color: var(--text-muted);
+}
+.sources ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
+/* Map */
+.map-wrap {
+  height: 22rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+}
+.map-wrap .maplibregl-map {
+  height: 100%;
+  width: 100%;
+}
+
+/* Before/after */
+.beforeafter {
+  display: flex;
+  gap: var(--space-4);
+  align-items: baseline;
+  margin: var(--space-3) 0;
+  font-variant-numeric: tabular-nums;
+}
+.beforeafter .delta.up {
+  color: var(--ok);
+}
+.beforeafter .delta.down {
+  color: var(--danger);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Respect reduced motion (accessibility.md). */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
