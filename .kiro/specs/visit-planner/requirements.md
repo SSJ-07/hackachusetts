@@ -27,6 +27,10 @@ Each requirement has a stable id (`VP-n`) referenced by `/provenance` and tests.
 - **VP-6 (shift rule).** THE planner SHALL NOT recommend a `slot` or `ride` whose
   door-to-door window (leave home → arrive home) overlaps the work shift. Overnight shifts
   and trip times `>= 86400` SHALL be handled without wrapping.
+- **VP-20 (childcare window).** WHEN a `childcare_window: [start, end]` is given, THE planner
+  SHALL treat it as a second no-go band and SHALL NOT recommend a `slot` or `ride` whose
+  door-to-door window overlaps it, by the same rule as VP-6 (overnight windows and trip
+  times `>= 86400` handled without wrapping). An omitted window applies no time constraint.
 - **VP-7 (no travel estimate).** WHEN a slot has no complete round trip, THE planner SHALL
   NOT offer it as a `slot`; it MAY offer it as a `ride` only when no work shift is stated.
 - **VP-8 (telehealth rule).** THE planner SHALL offer a `tele` option only when
@@ -60,8 +64,6 @@ Each requirement has a stable id (`VP-n`) referenced by `/provenance` and tests.
   make no I/O; the transit check is injected.
 
 ## Not yet covered (open)
-- **VP-20 (childcare).** Needs a childcare *window*; contracts.md has only
-  `childcare: bool`. Shape change → tell Sumedh first.
 - **VP-21 (cost, has_transport).** How `cost_worry` and `has_transport` change the options.
 - **VP-22 (recurrence).** Plan the repeating pattern (e.g. dialysis per week).
 - **VP-23 (plan B).** `plan_b` text from human-reviewed templates only (M3).
@@ -74,6 +76,7 @@ Each requirement has a stable id (`VP-n`) referenced by `/provenance` and tests.
 | VP-4 | `tests/contract/test_api_contracts.py::test_plan_unknown_visit_type` |
 | VP-5 | `tests/property/test_planner_properties.py::test_p15_escort_never_transit_only`, `test_planner_solver.py::test_escort_visit_gets_ride_not_slot` |
 | VP-6 | `test_planner_properties.py::test_p16_no_recommended_slot_overlaps_shift`, `test_planner_solver.py::test_travel_into_shift_excludes_slot`, `test_overnight_shift_and_after_midnight_trip` |
+| VP-20 | `test_planner_properties.py::test_p20_no_recommended_slot_overlaps_childcare_window`, `test_planner_solver.py::test_slot_overlapping_childcare_window_is_dropped`, `test_slot_outside_childcare_window_is_allowed`, `test_childcare_window_blocks_untimed_escort_ride` |
 | VP-7 | `test_planner_solver.py::test_escort_without_travel_estimate_*` |
 | VP-8 | `test_planner_properties.py::test_p17_telehealth_only_if_allowed` |
 | VP-10 | `test_planner_properties.py::test_none_is_alone_and_only_when_nothing_viable`, `test_planner_solver.py::test_no_candidates_*`, `test_unreachable_*` |

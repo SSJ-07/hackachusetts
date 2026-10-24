@@ -108,7 +108,112 @@
   },
   "planner": {
     "title": "Visit Planner",
-    "placeholder": "Visit Planner — owned by M4"
+    "intro": "Answer six quick questions. We show ways this visit can happen — and how to get there and back.",
+    "logisticsNote": "This is help with getting there. Your care team decides your care.",
+    "synthetic": "This is a practice patient. No real patient data is used.",
+    "illustrative": "Illustrative — not yet backed by real data.",
+    "step": "Step {{n}} of {{total}}",
+    "pickVisit": {
+      "legend": "What kind of visit is this?",
+      "hint": "Pick one.",
+      "next": "Start the questions"
+    },
+    "barrier": {
+      "title": "Six quick questions",
+      "back": "Back",
+      "next": "Next",
+      "submit": "Show the plan",
+      "yes": "Yes",
+      "no": "No",
+      "transport": {
+        "q": "Does the patient have a reliable way to get to and from this visit?",
+        "help": "A car, a ride they can count on, or a way they already use."
+      },
+      "work_shift": {
+        "q": "Do work hours make some times of day hard?",
+        "none": "No set work hours",
+        "has": "Yes, these hours:",
+        "start": "Start hour",
+        "end": "End hour"
+      },
+      "childcare": {
+        "q": "Does the patient need to care for a child or someone else?",
+        "none": "No",
+        "has": "Yes, during these hours:",
+        "start": "Care starts",
+        "end": "Care ends",
+        "help": "We will not pick a time that runs into these hours."
+      },
+      "escort": {
+        "q": "Can another adult come along and help the patient get home?",
+        "help": "Some visits need this. The patient cannot ride home alone."
+      },
+      "cost": {
+        "q": "Does the cost of getting there — bus fare or gas — worry the patient?"
+      },
+      "language": {
+        "q": "What language should the visit papers be in?",
+        "en": "English",
+        "es": "Spanish"
+      }
+    },
+    "plan": {
+      "loading": "Building the plan…",
+      "error": "Could not build the plan.",
+      "retry": "Try again",
+      "heading": "Ways this visit can happen",
+      "reason": "Why",
+      "whichReason": "Reason",
+      "optionKinds": {
+        "slot": "Take the bus",
+        "ride": "Get a ride with help",
+        "tele": "Visit by phone or video",
+        "prep": "Prep sheet",
+        "none": "Needs a navigator"
+      },
+      "recommended": "Best choice",
+      "recurrence": "This visit repeats about {{count}} times a week. Plan the same trip each time."
+    },
+    "itinerary": {
+      "title": "Your trip",
+      "out": "Going there",
+      "ret": "Coming home",
+      "walk": "Walk",
+      "bus": "Bus {{route}}",
+      "from": "from {{stop}}",
+      "to": "to {{stop}}",
+      "at": "at {{time}}",
+      "lastBus": "Last bus home leaves at {{time}}.",
+      "none": "No bus trip for this choice."
+    },
+    "phone": {
+      "title": "Phone view",
+      "help": "A small view you can read to the patient."
+    },
+    "pt1": {
+      "title": "Ride form (PT-1) — draft",
+      "note": "This is a draft to help fill the form. It is not sent yet.",
+      "toComplete": "for a person to complete",
+      "empty": "No ride form is needed for this plan."
+    },
+    "provenance": {
+      "open": "How we know this",
+      "title": "How we know this is right",
+      "loading": "Loading…",
+      "notFound": "No source found for this number.",
+      "source": "Source",
+      "vintage": "Year",
+      "requirement": "Rule",
+      "properties": "Checks",
+      "specLink": "See the rule",
+      "close": "Close",
+      "status": {
+        "pass": "Pass",
+        "fail": "Fail",
+        "pending": "Not yet checked"
+      }
+    },
+    "largeType": "Large text"
   },
   "about": {
     "title": "About Slot-to-Stop",

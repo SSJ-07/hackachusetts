@@ -18,7 +18,7 @@ TELE_RULE = VisitRule("test-tele", duration_min=30, escort_required=False, teleh
 PATIENT = Patient(id="synthetic-1", origin_bg=ORIGIN, lang="es")
 
 
-def barriers(shift=(7, 15), has_escort=False, language="es") -> Barriers:
+def barriers(shift=(7, 15), has_escort=False, language="es", childcare_window=None) -> Barriers:
     return Barriers(
         has_transport=False,
         work_shift=shift,
@@ -26,6 +26,7 @@ def barriers(shift=(7, 15), has_escort=False, language="es") -> Barriers:
         has_escort=has_escort,
         cost_worry=False,
         language=language,
+        childcare_window=childcare_window,
     )
 
 

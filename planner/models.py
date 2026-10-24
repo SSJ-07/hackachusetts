@@ -80,6 +80,7 @@ class Barriers:
     has_escort: bool
     cost_worry: bool
     language: str
+    childcare_window: tuple[int, int] | None = None  # (start_hour, end_hour), 24h local; may cross midnight (VP-20)
 
 
 @dataclass(frozen=True)

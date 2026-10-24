@@ -35,6 +35,7 @@ def _to_inputs(request: PlanRequest) -> tuple[Patient, Barriers]:
         has_escort=b.has_escort,
         cost_worry=b.cost_worry,
         language=b.language,
+        childcare_window=(b.childcare_window[0], b.childcare_window[1]) if b.childcare_window else None,
     )
     return patient, barriers
 
