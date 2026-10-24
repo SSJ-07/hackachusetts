@@ -14,7 +14,7 @@
 - [ ] 12. Load candidate slots from `data/manual/clinic_schedules.csv` (M3). _VP-1_
 - [ ] 13. Switch to M3's `pt1_fields.json` and real rulebook values; confirm file shapes with M3. _VP-2, VP-15_
 - [ ] 14. Childcare window: agree a contract change with Sumedh, then add the check + property. _VP-20_
-- [ ] 15. Use `cost_worry` / `has_transport` in option ranking. _VP-21_
+- [x] 15. Use `cost_worry` / `has_transport` as navigator-facing option flags (fixed kind order unchanged). _VP-21_
 - [ ] 16. Recurrence planning (e.g. dialysis per week). _VP-22_
 - [ ] 17. `plan_b` from reviewed templates (M3). _VP-23_
 - [ ] 18. Volunteer-driver windows for rides (M3 data). _VP-24_

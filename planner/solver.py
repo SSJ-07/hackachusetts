@@ -156,6 +156,16 @@ def plan_visit(
     shift = shift_intervals(barriers.work_shift)
     checked = _check(patient, rule, set(candidate_slots), round_trip, shift)
 
+    # VP-21: cost_worry and has_transport never change the FIXED kind order
+    # (slot | ride | tele | prep | none, R6) and never gate an option out — doing
+    # either would be a logistics judgement we cannot source. They are recorded as
+    # navigator-facing flags so the UI and a human can weigh burden and out-of-pocket
+    # cost, and they break ties among same-kind slots in favour of the lowest burden.
+    access_flags = {
+        "cost_sensitive": barriers.cost_worry,
+        "no_personal_transport": not barriers.has_transport,
+    }
+
     attend: list[tuple[Option, _Checked | None]] = []
     if rule.escort_required:
         # R1: rides only. The transit round trip is used as a conservative travel-time
@@ -170,17 +180,25 @@ def plan_visit(
                 "escort_required": True,
                 "has_escort": barriers.has_escort,
                 "pt1_request": True,
+                **access_flags,
             }
             attend.append((Option(OptionKind.RIDE, REASONS["ride_escort"], details), c))
     else:
         for c in checked:
             if c.window is None or c.shift_conflict:
                 continue
-            details = {"slot": slot_iso(c.slot), "clinic_id": c.slot.clinic_id}
+            details = {"slot": slot_iso(c.slot), "clinic_id": c.slot.clinic_id, **access_flags}
             attend.append((Option(OptionKind.SLOT, REASONS["slot"], details), c))
 
     if rule.telehealth_ok:  # R3
-        attend.append((Option(OptionKind.TELE, REASONS["tele"], {}), None))
+        # A telehealth visit removes the trip entirely, so flag it as the zero-travel
+        # option when the patient has no transport of their own or is cost-sensitive.
+        tele_details = {
+            "zero_travel": True,
+            "relieves_no_transport": not barriers.has_transport,
+            "relieves_cost": barriers.cost_worry,
+        }
+        attend.append((Option(OptionKind.TELE, REASONS["tele"], tele_details), None))
 
     # R6: stable order by kind, then by the candidate's burden/sort key.
     attend.sort(key=lambda oc: (KIND_RANK[oc[0].kind], oc[1].sort_key if oc[1] else ()))
