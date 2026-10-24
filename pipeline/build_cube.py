@@ -47,7 +47,10 @@ from engine import round_trip
 from engine.types import DEFAULT_LIMITS
 
 PVTA_DIR = ROOT / "data" / "cache" / "pvta"
-FRTA_DIR = ROOT / "data" / "manual" / "frta_minigtfs"
+# FRTA: staged copy in data/cache/frta (pipeline/stage_feeds.py) preferred; the
+# committed feed in data/manual/frta_minigtfs is the fallback.
+_FRTA_CACHE = ROOT / "data" / "cache" / "frta"
+FRTA_DIR = _FRTA_CACHE if (_FRTA_CACHE / "stops.txt").is_file() else ROOT / "data" / "manual" / "frta_minigtfs"
 ORIGINS = ROOT / "data" / "cache" / "origins.parquet"
 STOPS_WALK = ROOT / "data" / "cache" / "stops_walk.parquet"
 CLINIC_STOPS = ROOT / "data" / "manual" / "clinic_stops.csv"

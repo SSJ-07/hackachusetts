@@ -52,3 +52,23 @@ def test_real_whatif_keeps_shape(real_client):
     assert r.status_code == 200
     body = r.json()
     assert body["cells"] and set(body["equity"]) == {"ej", "lep", "age65", "zero_veh"}
+
+
+def test_real_audit_equity_ci(real_client):
+    """equity_ci (M3): present when data/raw has the ACS margins; every interval holds
+    its point estimate, and that estimate equals the plain equity share."""
+    from engine.equity import ACS_MOE_PATH
+
+    r = real_client.get("/audit", params={"clinic": CLINIC, "community": "all", "day": "thu"})
+    assert r.status_code == 200
+    body = r.json()
+    if not ACS_MOE_PATH.is_file():
+        assert body["equity_ci"] is None
+        return
+    ci = body["equity_ci"]
+    assert set(ci) == {"ej", "lep", "age65", "zero_veh"}
+    for g, v in ci.items():
+        assert 0.0 <= v["lo"] <= v["share"] <= v["hi"] <= 1.0, g
+        assert v["share"] == pytest.approx(body["equity"][g]["share"], abs=1e-9), g
+        assert v["n"] == body["equity"][g]["n"], g
+        assert v["moe"] >= 0

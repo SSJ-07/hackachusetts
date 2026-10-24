@@ -35,7 +35,9 @@ GTFS_ZIP = ROOT / "data" / "raw" / "pvta_gtfs.zip"
 # FRTA (rural Franklin County) feed, unzipped. Its stop ids are written with the
 # "frta:" prefix used by Timetable.from_gtfs_dirs; PVTA ids stay bare for
 # backward compatibility with existing consumers. (spec: multi-feed)
-FRTA_STOPS = ROOT / "data" / "manual" / "frta_minigtfs" / "stops.txt"
+_FRTA_CACHE_STOPS = ROOT / "data" / "cache" / "frta" / "stops.txt"  # pipeline/stage_feeds.py
+FRTA_STOPS = (_FRTA_CACHE_STOPS if _FRTA_CACHE_STOPS.is_file()
+              else ROOT / "data" / "manual" / "frta_minigtfs" / "stops.txt")
 OUT = CACHE / "stops_walk.parquet"
 
 MAX_WALK_M = 800.0       # max straight-line distance to a usable stop

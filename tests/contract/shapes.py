@@ -36,6 +36,21 @@ class Equity(_C):
     zero_veh: Group
 
 
+class CIGroup(_C):
+    share: float
+    lo: float
+    hi: float
+    moe: float
+    n: int
+
+
+class EquityCI(_C):
+    ej: CIGroup
+    lep: CIGroup
+    age65: CIGroup
+    zero_veh: CIGroup
+
+
 class Source(_C):
     name: str
     vintage: str
@@ -45,6 +60,7 @@ class Source(_C):
 class Audit(_C):
     cells: list[Cell]
     equity: Equity
+    equity_ci: EquityCI | None  # contracts.md: null when ACS margins are not built
     sources: list[Source]
 
 

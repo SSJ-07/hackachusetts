@@ -35,6 +35,22 @@
       "date": "2026-10-24",
       "reading_level_target": "grade-6",
       "translation_status": "human-reviewed"
+    },
+    {
+      "path": "planner/templates/en/plan_b.md",
+      "lang": "en",
+      "reviewer": null,
+      "reviewed": false,
+      "date": null,
+      "reading_level_target": "grade-6"
+    },
+    {
+      "path": "planner/templates/es/plan_b.md",
+      "lang": "es",
+      "reviewer": null,
+      "reviewed": false,
+      "date": null,
+      "reading_level_target": "grade-6"
     }
   ]
 }

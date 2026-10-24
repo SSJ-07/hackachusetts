@@ -33,7 +33,8 @@ PLACEHOLDER = {"", "todo-verify", "tbd", "n/a", "na", "null", "none"}
 SOURCE_COLS = ("source_url", "source", "source_urls")
 # Columns whose values must look like HH:MM[:SS] when present.
 TIME_COLS = ("start_time", "end_time", "open_time", "close_time", "arrive_by",
-             "earliest_return_departure")
+             "earliest_return_departure",
+             "start", "end")  # e.g. volunteer_driver_windows.csv (VP-24)
 
 
 def _sourced(row: dict) -> bool:
