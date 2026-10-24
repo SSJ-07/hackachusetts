@@ -1,0 +1,14 @@
+{
+  "_mock_notice": "MOCK for GET /provenance. Shape from docs/contracts.md section 3. Property statuses are 'pending' because the raptor-router spec and its tests do not exist yet.",
+  "records": {
+    "mock-audit-cell": {
+      "source": { "name": "MOCK data (illustrative, not computed)", "vintage": "mock" },
+      "requirement_id": "RT-8",
+      "properties": [
+        { "name": "round-trip soundness", "status": "pending" },
+        { "name": "midnight safety", "status": "pending" }
+      ],
+      "spec_link": ".kiro/specs/raptor-router/requirements.md#RT-8"
+    }
+  }
+}

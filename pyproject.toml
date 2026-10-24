@@ -1,0 +1,39 @@
+# Shared project config. Started by M4 for api/ + planner/; other members add their
+# packages to [tool.setuptools.packages.find] and their dependencies below.
+[build-system]
+requires = ["setuptools==84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slot-to-stop"
+version = "0.1.0"
+description = "Slot-to-Stop: Reachable Care"
+requires-python = ">=3.12"
+dependencies = [
+    # api/ (M4)
+    "fastapi==0.162.0",
+    "pydantic==2.14.1",
+    "uvicorn==0.54.0",
+    # planner/ (M4): reads visit_rules.yaml
+    "pyyaml==6.0.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx==0.28.1",       # required by fastapi.testclient
+    "hypothesis==6.170.9", # property-based tests
+    "pytest==9.1.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["api*", "planner*"]
+
+[tool.setuptools.package-data]
+api = ["mocks/*.json", "mocks/planner/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# "mcp" lets tests import access_resources_mcp without a top-level mcp package
+# (which would shadow the MCP SDK).
+pythonpath = [".", "mcp"]
+addopts = "-ra --strict-markers --import-mode=importlib"

@@ -1,0 +1,13 @@
+{
+  "_mock_notice": "SYNTHETIC patient 'Maria' (fictional composite from final_plan). Not a real person. origin_bg uses tract 000000 so it cannot match a real block group.",
+  "patient": { "id": "maria", "origin_bg": "250130000000", "lang": "es" },
+  "visit_type": "colonoscopy",
+  "barriers": {
+    "has_transport": false,
+    "work_shift": [7, 15],
+    "childcare": false,
+    "has_escort": false,
+    "cost_worry": true,
+    "language": "es"
+  }
+}
