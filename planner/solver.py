@@ -209,23 +209,31 @@ def plan_visit(
         ]
     else:
         options = [o for o, _ in attend]
-        # VP-22: a recurring visit (e.g. dialysis 3x/week) is not a one-off. Annotate the
-        # top attend option so the UI/navigator plans the repeating pattern. Logistics
-        # only: we surface the cadence from the rulebook, never a clinical schedule.
+        # VP-22 (task 1): a recurring visit (e.g. dialysis 3x/week, infusion per cycle)
+        # is not a one-off. Carry a structured recurrence plan on the top attend option
+        # so the UI/navigator arranges the REPEATING trip, and so a ride reflects the
+        # PT-1-once-per-destination rule (the broker then schedules each repeat — see
+        # data/manual/pt1_fields.json recurrence_note). Logistics only: the cadence is
+        # the rulebook's sourced number, never a clinical schedule we invent.
         if rule.recurrence_per_week and options:
             top = options[0]
-            options[0] = Option(
-                top.kind,
-                top.why,
-                {
-                    **top.details,
-                    "recurrence_per_week": rule.recurrence_per_week,
-                    "recurrence_note": (
-                        f"This visit repeats about {rule.recurrence_per_week}x per week; "
-                        "plan the same trip for each session."
-                    ),
-                },
-            )
+            per_week = rule.recurrence_per_week
+            recurrence = {
+                "per_week": per_week,
+                "repeats": True,
+                "same_trip_each_session": True,
+                "note": (
+                    f"This visit repeats about {per_week}x per week. "
+                    "Plan the same round trip for every session."
+                ),
+            }
+            if top.kind is OptionKind.RIDE:
+                # One PT-1 per destination; the broker (MART/GATRA) schedules the repeats.
+                recurrence["pt1_once_per_destination"] = True
+                recurrence["note"] += (
+                    " Submit one PT-1 for this destination; the broker schedules each ride."
+                )
+            options[0] = Option(top.kind, top.why, {**top.details, "recurrence": recurrence})
         if rule.prep:
             options.append(
                 Option(

@@ -92,6 +92,49 @@ export interface BlockGroupsResponse {
   sources: SourceRef[];
 }
 
+/** One top-k schedule change the optimizer proposes (GET /suggest). */
+export interface SuggestChange {
+  /** optimizer move kind, e.g. "move_block" */
+  kind: string;
+  day: string;
+  /** block key the change acts on, e.g. "mon-08" */
+  block: string;
+  /** new start hour, 24h local */
+  to: number;
+}
+
+/** One suggestion: a change plus the gain it buys and its citations. */
+export interface Suggestion {
+  change: SuggestChange;
+  /** extra visit-hours of reach this change buys */
+  gain_visit_hours: number;
+  /** extra car-less adults reached by this change */
+  gain_people: number;
+  /** provenance for every number in this suggestion; a source may carry
+   * `illustrative: true` when it is not yet backed by real data. */
+  sources: SuggestSource[];
+}
+
+/** A source ref on a suggestion. Superset of SourceRef: the optimizer may flag
+ * a source as illustrative (synthetic/placeholder, not real-data-backed). */
+export interface SuggestSource extends SourceRef {
+  illustrative?: boolean;
+}
+
+/** GET /suggest?clinic&day&k&blocks — top-k schedule changes. */
+export interface SuggestResponse {
+  clinic: string;
+  day: string;
+  k: number;
+  baseline_score: number;
+  suggested_score: number;
+  baseline_blocks: number[];
+  suggested_blocks: number[];
+  open_hours: number[];
+  changes: Suggestion[];
+  sources: SuggestSource[];
+}
+
 // --- Compile-time assertions that our hand types match the generated schema.
 // If the OpenAPI schema drifts from this file, one of these lines fails to
 // typecheck, which fails `npm run build`.

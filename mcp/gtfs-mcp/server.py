@@ -88,7 +88,7 @@ def _leg_dict(leg: Leg) -> dict[str, Any]:
 # --------------------------------------------------------------------------
 # Tools
 # --------------------------------------------------------------------------
-@server.tool()
+@server.tool(name="round_trip")  # contracts.md §2 tool name
 def round_trip_tool(origin: str, clinic: str, date: str, start: int, minutes: int) -> dict[str, Any]:
     """Round trip for an appointment. Returns RoundTripResult (contracts.md §2).
 
@@ -107,9 +107,6 @@ def round_trip_tool(origin: str, clinic: str, date: str, start: int, minutes: in
         "sources": [_feed_source()],
     }
 
-
-# contracts.md §2 names the tool `round_trip`; expose that name too.
-round_trip_tool.__name__ = "round_trip"  # type: ignore[attr-defined]
 
 
 @server.tool()

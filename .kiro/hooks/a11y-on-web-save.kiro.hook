@@ -1,0 +1,9 @@
+{
+  "name": "a11y-on-web-save",
+  "description": "When a file under web/** is saved in the Kiro IDE, run the accessibility suite (cd web && npm run a11y) so an accessibility regression is caught at edit time, not only in CI. Fires in the Kiro IDE (fileEdited). File hooks fire only on agent/IDE edits, so CI repeats this check.",
+  "trigger": "fileEdited",
+  "matcher": "web/**",
+  "action": "cd web && npm run a11y",
+  "timeout": 180,
+  "enabled": true
+}

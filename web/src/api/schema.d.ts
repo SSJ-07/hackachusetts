@@ -106,6 +106,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Top-k schedule changes (optimizer) */
+        get: operations["get_suggest_suggest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/whatif": {
         parameters: {
             query?: never;
@@ -371,6 +388,54 @@ export interface components {
             /** Vintage */
             vintage: string;
         };
+        /** SuggestChangeOut */
+        SuggestChangeOut: {
+            /** Block */
+            block: string;
+            /** Day */
+            day: string;
+            /** Kind */
+            kind: string;
+            /** To */
+            to: number;
+        };
+        /** SuggestResponse */
+        SuggestResponse: {
+            /** Baseline Blocks */
+            baseline_blocks: number[];
+            /** Baseline Score */
+            baseline_score: number;
+            /** Changes */
+            changes: components["schemas"]["SuggestionOut"][];
+            /** Clinic */
+            clinic: string;
+            /** Day */
+            day: string;
+            /** K */
+            k: number;
+            /** Open Hours */
+            open_hours: number[];
+            /** Sources */
+            sources: {
+                [key: string]: unknown;
+            }[];
+            /** Suggested Blocks */
+            suggested_blocks: number[];
+            /** Suggested Score */
+            suggested_score: number;
+        };
+        /** SuggestionOut */
+        SuggestionOut: {
+            change: components["schemas"]["SuggestChangeOut"];
+            /** Gain People */
+            gain_people: number;
+            /** Gain Visit Hours */
+            gain_visit_hours: number;
+            /** Sources */
+            sources: {
+                [key: string]: unknown;
+            }[];
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -571,6 +636,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProvenanceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_suggest_suggest_get: {
+        parameters: {
+            query: {
+                clinic: string;
+                day: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
+                k?: number;
+                blocks?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuggestResponse"];
                 };
             };
             /** @description Validation Error */
