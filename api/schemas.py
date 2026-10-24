@@ -55,9 +55,28 @@ class Equity(BaseModel):
     zero_veh: EquityGroup
 
 
+class EquityCIGroup(BaseModel):
+    """90% confidence interval from ACS margins of error (engine/equity.py)."""
+
+    share: float = Field(ge=0.0, le=1.0)
+    lo: float = Field(ge=0.0, le=1.0)
+    hi: float = Field(ge=0.0, le=1.0)
+    moe: float = Field(ge=0.0)
+    n: int = Field(ge=0)
+
+
+class EquityCI(BaseModel):
+    ej: EquityCIGroup
+    lep: EquityCIGroup
+    age65: EquityCIGroup
+    zero_veh: EquityCIGroup
+
+
 class AuditResponse(BaseModel):
     cells: list[AuditCell]
     equity: Equity
+    # null when ACS margins of error are not built (mock mode, CI without data/raw)
+    equity_ci: EquityCI | None = None
     sources: list[SourceRef]
 
 

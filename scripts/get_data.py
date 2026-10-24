@@ -209,6 +209,50 @@ def acs_download(manifest: dict, force: bool) -> None:
            variables=ACS_VARS, validation=info)
     log(f"[ ok ] acs_bg: {info}")
 
+
+# ACS margins of error (90%) for the same variables -> data/raw/acs_bg_moe.csv.
+# Kept in a SEPARATE file: estimates + margins together exceed the Census API's
+# 50-variables-per-call limit, and acs_bg.csv stays byte-for-byte what it was.
+# Used by engine/equity.py for the /audit equity confidence intervals (M3).
+ACS_MOE_VARS = [v[:-1] + "M" for v in ACS_VARS]
+
+
+def acs_moe_download(manifest: dict, force: bool) -> None:
+    path = RAW / "acs_bg_moe.csv"
+    if path.exists() and not force:
+        log("[skip] acs_bg_moe.csv already exists")
+    else:
+        key = read_census_key()
+        header, rows = None, []
+        for county, cname in COUNTIES.items():
+            url = (f"https://api.census.gov/data/{ACS_YEAR}/acs/acs5?get={','.join(ACS_MOE_VARS)}"
+                   f"&for=block%20group:*&in=state:{STATE}&in=county:{county}&in=tract:*&key={key}")
+            log(f"[get ] ACS {ACS_YEAR} margins of error for {cname} County ...")
+            body = fetch(url)
+            try:
+                data = json.loads(body)
+            except json.JSONDecodeError:
+                sys.exit("ERROR: Census API did not return JSON for the MOE request (bad or missing key?).")
+            header = header or data[0]
+            rows += data[1:]
+        with path.open("w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["GEOID"] + header)
+            for r in rows:
+                rec = dict(zip(header, r))
+                w.writerow([rec["state"] + rec["county"] + rec["tract"] + rec["block group"]] + r)
+    with path.open(encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    missing = [v for v in ACS_MOE_VARS if v not in rows[0]]
+    if missing:
+        raise ValueError(f"ACS MOE file missing columns {missing}")
+    if len(rows) < 480:
+        raise ValueError(f"ACS MOE file has only {len(rows)} block groups; expected ~506")
+    info = {"rows": len(rows), "vintage": f"ACS {ACS_YEAR} 5-year (90% MOE)"}
+    record(manifest, "acs_bg_moe", f"https://api.census.gov/data/{ACS_YEAR}/acs/acs5", path,
+           variables=ACS_MOE_VARS, validation=info)
+    log(f"[ ok ] acs_bg_moe: {info}")
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--force", action="store_true", help="re-download everything")
@@ -218,6 +262,7 @@ def main() -> None:
     manifest = load_manifest()
     simple_downloads(manifest, args.force)
     acs_download(manifest, args.force)
+    acs_moe_download(manifest, args.force)
     MANIFEST.write_text(json.dumps(manifest, indent=2))
     log(f"Done. Manifest written to {MANIFEST.relative_to(ROOT)}")
 

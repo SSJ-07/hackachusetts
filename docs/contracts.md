@@ -118,6 +118,15 @@ Reachability for one clinic × community × day.
     "age65":     { "share": 0.15, "n": 90  },
     "zero_veh":  { "share": 0.12, "n": 540 }
   },
+  "equity_ci": {                       // M3, additive; null when ACS margins are not built
+    "ej":        { "share": 0.10, "lo": 0.07, "hi": 0.13, "moe": 0.03, "n": 320 },
+    "lep":       { "share": 0.08, "lo": 0.03, "hi": 0.13, "moe": 0.05, "n": 140 },
+    "age65":     { "share": 0.15, "lo": 0.11, "hi": 0.19, "moe": 0.04, "n": 90  },
+    "zero_veh":  { "share": 0.12, "lo": 0.10, "hi": 0.14, "moe": 0.02, "n": 540 }
+    // 90% confidence interval from ACS 5-yr margins of error (engine/equity.py,
+    // Census ACS handbook ch. 8 formulas). share and n equal "equity" exactly;
+    // always lo <= share <= hi, all in [0, 1]. Example values are illustrative.
+  },
   "sources": [
     { "name": "PVTA GTFS", "vintage": "2026-09-18", "url": "https://www.pvta.com/..." },
     { "name": "ACS 5-yr B25044", "vintage": "2022", "url": "https://..." }
