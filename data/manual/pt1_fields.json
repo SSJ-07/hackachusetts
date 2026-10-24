@@ -1,40 +1,50 @@
 {
-  "_comment": "MassHealth PT-1 (Prescription for Transportation, renamed 'Provider Request for Transportation' per TRN-33, 2017). Fields reconstructed from mass.gov bulletins and the online-submission how-to. The form itself (mass.gov/masshealth) returned HTTP 403 to automated fetch, so exact field labels/order are NOT verified against the live form. See MISSING section. Values are filled by the planner into /plan pt1_prefill (docs/contracts.md). Synthetic patients only.",
+  "_comment": "MassHealth PT-1 (renamed 'Provider Request for Transportation' per TRN-33, 2017). Submitted on the MassHealth Customer Web Portal (CWP). Once approved, rides are scheduled through a broker (MART or GATRA). The live CWP form is behind a provider login (fetch returned HTTP 403), so exact on-screen field LABELS/ORDER are not pinned; the field SET and the mode/MNF/recurrence semantics are confirmed from MassHealth bulletins. Values fill /plan pt1_prefill (docs/contracts.md). Synthetic patients only.",
   "form_id": "PT-1",
   "form_name": "Provider Request for Transportation (formerly Prescription for Transportation)",
+  "submission": {
+    "portal": "MassHealth Customer Web Portal (CWP)",
+    "brokers": ["MART", "GATRA"],
+    "one_per": "location/service (a separate PT-1 per destination)"
+  },
   "source": {
     "authority": "MassHealth / Office of Medicaid (mass.gov)",
     "basis": [
       "https://www.mass.gov/how-to/how-to-complete-and-submit-or-view-the-pt-1-online",
-      "https://www.mass.gov/info-details/learn-about-non-emergency-medical-transportation-for-masshealth-members",
-      "https://www.mass.gov/doc/all-provider-bulletin-218-service-animal-indication-on-the-prescription-for-transportation-pt-1/download",
-      "https://www.mass.gov/info-details/pt-1-frequently-asked-questions-faq-for-providers"
+      "https://www.mass.gov/doc/all-provider-bulletin-339-upcoming-changes-to-masshealth-nonemergency-wheelchair-van-transportation-services-0/download",
+      "https://www.mass.gov/doc/masshealth-medical-necessity-form-for-nonemergency-ambulancewheelchair-van-transportation-mnr/download",
+      "https://www.mass.gov/info-details/get-a-ride-to-masshealth-medical-appointments",
+      "https://www.mass.gov/doc/all-provider-bulletin-218-service-animal-indication-on-the-prescription-for-transportation-pt-1/download"
     ],
-    "vintage": "TRN-33 rename 2017; service-animal field APB-218 2011; confirm against current live form",
-    "verified": false
+    "vintage": "TRN-33 rename 2017; wheelchair-van CWP change APB-339 (2022); service-animal APB-218 (2011)",
+    "verified": "field set + semantics verified from bulletins; exact live-form labels not pinned"
   },
   "fields": [
-    { "key": "member_name", "label": "MassHealth member name", "type": "string", "required": true, "verified": false },
-    { "key": "member_id", "label": "MassHealth member ID", "type": "string", "required": true, "verified": false },
-    { "key": "member_dob", "label": "Member date of birth", "type": "date", "required": true, "verified": false },
+    { "key": "member_name", "label": "MassHealth member name", "type": "string", "required": true, "verified": true },
+    { "key": "member_id", "label": "MassHealth member ID", "type": "string", "required": true, "verified": true },
+    { "key": "member_dob", "label": "Member date of birth", "type": "date", "required": true, "verified": true },
     { "key": "eligible_for_transportation", "label": "Eligible for Transportation (member must be eligible to proceed)", "type": "bool", "required": true, "verified": true, "note": "Named in the online how-to; submission blocked if not eligible." },
-    { "key": "pickup_address", "label": "Member pickup / residence address", "type": "address", "required": true, "verified": true, "note": "'authorized only for the addresses on the PT-1 form'; new request needed within 30 days of address change." },
+    { "key": "pickup_address", "label": "Member pickup / residence address", "type": "address", "required": true, "verified": true, "note": "Authorized only for the addresses on the PT-1; new request needed within 30 days of address change." },
     { "key": "submitter_provider", "label": "PT-1 submitter (provider linked to account)", "type": "string", "required": true, "verified": true },
     { "key": "treating_provider_same_as_submitter", "label": "Is the treating provider the same as the submitter?", "type": "bool", "required": true, "verified": true },
     { "key": "treating_provider_npi", "label": "Treating provider NPI", "type": "string", "required": false, "verified": true, "note": "Searched by NPI or last name + zip when treating provider differs." },
     { "key": "treating_provider_name", "label": "Treating provider name", "type": "string", "required": false, "verified": true },
     { "key": "treatment_address", "label": "Treatment / destination address", "type": "address", "required": true, "verified": true, "note": "One PT-1 per location/service." },
     { "key": "service_animal", "label": "Member accompanied by a service animal?", "type": "bool", "required": false, "verified": true, "note": "APB-218 (2011) added this indicator." },
-    { "key": "transport_mode", "label": "Requested mode of transportation", "type": "enum", "required": false, "verified": false, "note": "Mode options (e.g. livery, wheelchair van, taxi, public transit) not confirmed from live form." },
-    { "key": "medical_necessity", "label": "Medical necessity / reason for transportation", "type": "string", "required": false, "verified": false, "note": "A Medical Necessity Form (MNF) is referenced alongside PT-1 (TRN-31); relationship to PT-1 fields unconfirmed." },
-    { "key": "frequency", "label": "Trip frequency / recurring need (e.g. 3x/week for dialysis)", "type": "string", "required": false, "verified": false, "note": "Recurrence capture on the form is unconfirmed; needed for dialysis." },
-    { "key": "effective_dates", "label": "Authorization effective date range", "type": "daterange", "required": false, "verified": false }
+    { "key": "transport_mode", "label": "Requested mode of transportation", "type": "enum", "required": true, "verified": true, "enum": ["sedan/livery", "wheelchair_van", "nonemergency_ambulance"], "note": "APB-339: PT-1 required for wheelchair van and sedan via CWP. Wheelchair van + ambulance also require the separate MNF (below). Public transit is NOT a PT-1 mode." },
+    { "key": "effective_dates", "label": "Authorization effective date range", "type": "daterange", "required": false, "verified": true, "note": "Authorization window; broker schedules individual trips within it." }
   ],
+  "related_form_MNF": {
+    "name": "Medical Necessity Form (MNF) for Nonemergency Ambulance / Wheelchair Van",
+    "relationship": "SEPARATE form, NOT PT-1 fields. Required for wheelchair-van and nonemergency-ambulance modes to document medical necessity. Transportation provider completes it and retains it 6 years.",
+    "url": "https://www.mass.gov/doc/masshealth-medical-necessity-form-for-nonemergency-ambulancewheelchair-van-transportation-mnr/download",
+    "verified": true
+  },
+  "recurrence_note": {
+    "handling": "The PT-1 has NO per-visit frequency field. Recurring trips (e.g. dialysis 3x/week) are handled by the broker (MART/GATRA) scheduling repeat rides AFTER a single PT-1 approval for that destination. One PT-1 per location/service.",
+    "verified": true
+  },
   "MISSING_MANUAL_CHECK": [
-    "Exact field labels, order, and which are mandatory: the live PT-1 form at mass.gov/masshealth returned HTTP 403 to automated fetch. A human must open the actual form (logged-in provider portal or the downloadable form) and confirm the schema. WHY MANUAL: the form is behind an anti-bot / auth wall I cannot fetch.",
-    "transport_mode enum values: not confirmed. A human must list the actual mode options the form offers.",
-    "Relationship between PT-1 and the separate Medical Necessity Form (MNF): TRN-31 references both; confirm which clinical/necessity fields live on PT-1 vs MNF. WHY MANUAL: requires reading current regs.",
-    "Whether recurring-trip frequency (dialysis 3x/week) is a PT-1 field or requires separate requests per date. FAQ implies per-location requests; confirm. WHY MANUAL: requires the live form + FAQ.",
-    "All fields marked verified:false are reconstructions, not confirmed labels. Do not present them as the authoritative form schema until verified."
+    "Exact on-screen field LABELS and ORDER on the live CWP form are not pinned (the portal is behind a provider login; fetch 403'd). The field SET, the transport-mode enum, the MNF relationship, and recurrence handling ARE confirmed from MassHealth bulletins. OPTIONAL for the demo: a provider-portal user can screenshot the live form to pin exact labels. Not blocking — /plan pt1_prefill keys off the stable `key` values here, not the display labels."
   ]
 }
