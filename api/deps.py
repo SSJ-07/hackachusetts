@@ -22,13 +22,16 @@ from planner.models import CandidateSlot, VisitRule
 from planner.pt1 import Pt1Field, Pt1FieldsError, load_fields, load_fields_inventory
 from planner.rules import RulebookError, load_rules
 from planner.slots import ClinicScheduleError, load_slots, slots_for_rule
-from planner.transit import FixtureRoundTrip, RoundTripFn
+from planner.transit import FixtureRoundTrip, RoundTripFn, TimetableRoundTrip
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REAL_RULES_PATH = REPO_ROOT / "planner" / "visit_rules.yaml"
 REAL_PT1_PATH = REPO_ROOT / "data" / "manual" / "pt1_fields.json"
 REAL_CLINIC_SCHEDULE_PATH = REPO_ROOT / "data" / "manual" / "clinic_schedules.csv"
 REAL_PROVENANCE_PATH = REPO_ROOT / "docs" / "provenance.jsonl"
+REAL_PVTA_DIR = REPO_ROOT / "data" / "cache" / "pvta"
+REAL_ORIGINS_PATH = REPO_ROOT / "data" / "cache" / "origins.parquet"
+REAL_CLINIC_STOPS_PATH = REPO_ROOT / "data" / "manual" / "clinic_stops.csv"
 
 DataMode = Literal["mock", "real"]
 CandidateSlotSource = Callable[[VisitRule], Sequence[CandidateSlot]]
@@ -131,9 +134,11 @@ def get_candidate_slot_source() -> CandidateSlotSource:
 
 def get_round_trip() -> RoundTripFn:
     if data_mode() == "real":
-        # STILL BLOCKED (task 11): engine.round_trip(tt, ...) exists, but it needs a
-        # loaded PVTA Timetable AND an origin_bg/clinic_id -> feed-stop resolution via
-        # data/cache/stops_walk.parquet, which is not built yet (M1/M2 handoff). Until
-        # that lands, real mode cannot route; 503 rather than a silent wrong answer.
-        raise _unavailable("Routing engine (engine.round_trip + stops_walk.parquet, M1/M2)")
+        # Task 11: real routing over the PVTA feed via the engine's authoritative
+        # round_trip, resolving origin_bg/clinic_id to coordinates. Requires the
+        # pipeline caches; when any is missing, routing is genuinely unavailable (503)
+        # rather than silently stubbed.
+        if TimetableRoundTrip.cache_ready(REAL_PVTA_DIR, REAL_ORIGINS_PATH, REAL_CLINIC_STOPS_PATH):
+            return TimetableRoundTrip(REAL_PVTA_DIR, REAL_ORIGINS_PATH, REAL_CLINIC_STOPS_PATH)
+        raise _unavailable("Routing engine (needs data/cache/pvta + origins.parquet + clinic_stops.csv)")
     return FixtureRoundTrip.from_records(mocks.load("planner/round_trips.json")["records"])

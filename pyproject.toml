@@ -24,6 +24,12 @@ dev = [
     "hypothesis==6.170.9", # property-based tests
     "pytest==9.1.1",
 ]
+pipeline = [
+    # data pipeline (origins, stops_walk, cube) — not needed to run the API with mocks
+    "pandas",
+    "numpy",
+    "pyarrow",
+]
 
 [tool.setuptools.packages.find]
 include = ["api*", "planner*"]

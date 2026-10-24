@@ -2,7 +2,15 @@
 
 from pathlib import Path
 
+import pytest
+
+from api.deps import REAL_CLINIC_STOPS_PATH, REAL_ORIGINS_PATH, REAL_PVTA_DIR
+from planner.transit import TimetableRoundTrip
 from tests.contract import shapes
+
+_ROUTING_CACHE_READY = TimetableRoundTrip.cache_ready(
+    REAL_PVTA_DIR, REAL_ORIGINS_PATH, REAL_CLINIC_STOPS_PATH
+)
 
 
 def _assert_mock_mode(response):
@@ -116,9 +124,27 @@ def test_real_mode_reports_unavailable(monkeypatch, maria_request):
     # /provenance now serves from docs/provenance.jsonl in real mode: a mock-only id is
     # simply unknown there (404), not 503.
     assert real.get("/provenance", params={"id": "mock-audit-cell"}).status_code == 404
-    # /plan still 503s in real mode: slots + PT-1 load, but routing (task 11) is blocked
-    # on stops_walk.parquet, so get_round_trip raises 503.
-    assert real.post("/plan", json=maria_request).status_code == 503
+    # /plan in real mode: 503 while the routing cache is absent (routing unavailable),
+    # 200 once data/cache/pvta + origins + clinic_stops are present.
+    plan_status = real.post("/plan", json=maria_request).status_code
+    assert plan_status == (200 if _ROUTING_CACHE_READY else 503)
+
+
+@pytest.mark.skipif(not _ROUTING_CACHE_READY, reason="routing cache (data/cache/pvta) not present")
+def test_maria_real_routing_end_to_end(monkeypatch, maria_request):
+    """Task 11: /plan in real mode routes through the real engine over the PVTA feed.
+    Runs only when the pipeline cache is present (CI without data skips this)."""
+    from fastapi.testclient import TestClient
+
+    from api.main import create_app
+
+    monkeypatch.setenv("SLOT_TO_STOP_DATA", "real")
+    client = TestClient(create_app())
+    r = client.post("/plan", json=maria_request)
+    assert r.status_code == 200
+    body = shapes.Plan.model_validate(r.json())
+    # Escort visit: never a transit-only slot, whatever the real feed says.
+    assert "slot" not in {o.kind for o in body.options}
 
 
 def test_real_provenance_serves_from_jsonl(monkeypatch):
