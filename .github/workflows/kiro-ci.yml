@@ -1,0 +1,36 @@
+name: kiro-ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    name: engine + contract tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest hypothesis ortools
+          if [ -f mcp/requirements.txt ]; then pip install -r mcp/requirements.txt; fi
+
+      - name: Run tests (unit + property + differential + golden)
+        # The real gate. Must NOT swallow failures — a red test blocks the PR.
+        run: pytest -q
+
+      - name: Kiro release-checker gate (headless CLI)
+        # Placeholder: wire the headless Kiro CLI once the exact flags are
+        # confirmed with `kiro-cli --help`. Intended command (does not fail the
+        # build yet):
+        #   kiro-cli agent run release-checker --headless --fail-on-error
+        run: 'echo "TODO - kiro-cli release-checker gate; confirm flags with kiro-cli --help"'
