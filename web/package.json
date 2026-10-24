@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "test": "vitest run",
-    "e2e": "playwright test e2e/audit.spec.ts",
+    "e2e": "playwright test e2e/audit.spec.ts e2e/planner.spec.ts",
     "a11y": "playwright test e2e/a11y.spec.ts",
     "gen:api": "${PYTHON:-python} ../scripts/dump_openapi.py > openapi.json && openapi-typescript openapi.json -o src/api/schema.d.ts"
   },
