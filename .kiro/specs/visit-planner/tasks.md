@@ -15,7 +15,7 @@
 - [x] 13. Real mode reads M3's `pt1_fields.json` (inventory adapter) + real `visit_rules.yaml`; file shapes confirmed (`planner/pt1.py::load_fields_inventory`, `api/deps.py`). _VP-2, VP-15_
 - [ ] 14. Childcare window: agree a contract change with Sumedh, then add the check + property. _VP-20_
 - [x] 15. Use `cost_worry` / `has_transport` as navigator-facing option flags (fixed kind order unchanged). _VP-21_
-- [x] 16. Recurrence annotation on the top option from `recurrence_per_week` (e.g. dialysis per week). _VP-22_
+- [x] 16. Recurrence PLAN on the top option (per_week, same-trip-each-session, PT-1-once for rides) from `recurrence_per_week`; property P22. _VP-22_
 - [ ] 17. `plan_b` from reviewed templates (M3). _VP-23_
 - [ ] 18. Volunteer-driver windows for rides (M3 data). _VP-24_
 - [x] 19.* Property: itinerary integrity — `last_bus_home` is truly last (plan B vs A waits on M3 templates, VP-23). _VP-14_
