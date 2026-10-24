@@ -9,7 +9,7 @@ from fastapi import FastAPI, Request
 
 from api import __version__
 from api.deps import data_mode
-from api.routers import audit, plan, provenance, whatif
+from api.routers import audit, clinics, plan, provenance, whatif
 from api.schemas import HealthResponse
 
 
@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
         return HealthResponse(version=__version__, data_mode=mode)
 
     app.include_router(audit.router)  # M2
+    app.include_router(clinics.router)  # M1 (web Audit screen)
     app.include_router(whatif.router)  # M2
     app.include_router(plan.router)  # M4
     app.include_router(provenance.router)  # M4

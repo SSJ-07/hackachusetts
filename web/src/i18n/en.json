@@ -1,0 +1,95 @@
+{
+  "app": {
+    "brand": "Slot-to-Stop",
+    "skipToContent": "Skip to main content",
+    "language": "Language",
+    "nav": {
+      "audit": "Clinic Audit",
+      "planner": "Visit Planner",
+      "about": "About"
+    }
+  },
+  "audit": {
+    "title": "Clinic reach audit",
+    "intro": "See how many car-less adults can reach this clinic by bus, hour by hour.",
+    "clinic": "Clinic",
+    "community": "Community",
+    "day": "Day",
+    "loading": "Loading audit…",
+    "empty": "No reach data for this clinic, community, and day yet.",
+    "error": "Could not load the audit.",
+    "retry": "Try again",
+    "gridCaption": "Share of car-less adults who can reach the clinic, by day and hour.",
+    "hour": "Hour",
+    "cellName": "{{day}} {{hour}}, {{pct}}% of {{n}} car-less adults can reach the clinic",
+    "cellNoData": "{{day}} {{hour}}, no data",
+    "pickUpHint": "Press Enter to pick up this block, then use arrow keys and Enter to move it.",
+    "ribbon": {
+      "title": "Day view: {{day}}",
+      "empty": "Choose a cell to see that day's hours."
+    },
+    "whatif": {
+      "moving": "Moving block…",
+      "movedTitle": "Block moved",
+      "before": "Before",
+      "after": "After",
+      "change": "Change",
+      "picked": "Picked up {{day}} {{hour}}. Use arrow keys to choose a new hour, Enter to drop, Esc to cancel.",
+      "dropped": "Moved the {{day}} block to {{hour}}. Grid updated.",
+      "cancelled": "Move cancelled."
+    },
+    "days": {
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday",
+      "sun": "Sunday"
+    },
+    "dayShort": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
+  "equity": {
+    "title": "Who is reached",
+    "share": "Can reach",
+    "ofN": "of {{n}}",
+    "groups": {
+      "ej": "Environmental Justice areas",
+      "lep": "Limited English",
+      "age65": "Age 65 and older",
+      "zero_veh": "No car in household"
+    }
+  },
+  "map": {
+    "title": "Block groups",
+    "notLoaded": "Map data not loaded. The block-group map is hidden, but all numbers above come from the API.",
+    "legendTitle": "Share reached",
+    "desert": "Transit desert (no reach)"
+  },
+  "legend": {
+    "title": "Share of car-less adults reached",
+    "none": "No data"
+  },
+  "sources": {
+    "title": "Sources",
+    "intro": "Every number above comes from these sources.",
+    "vintage": "Vintage"
+  },
+  "planner": {
+    "title": "Visit Planner",
+    "placeholder": "Visit Planner — owned by M4"
+  },
+  "about": {
+    "title": "About Slot-to-Stop",
+    "body": "Slot-to-Stop shows how clinic appointment hours line up with bus service, so clinics can pick hours that more car-less patients can actually reach. Logistics only. Your care team decides your care.",
+    "guardrail": "Every number carries a source and vintage. Patients shown are synthetic."
+  }
+}

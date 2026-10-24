@@ -61,6 +61,37 @@ class AuditResponse(BaseModel):
     sources: list[SourceRef]
 
 
+# --------------------------------------------------------------------------- #
+# GET /clinics, GET /audit/blockgroups (additive, for the web Audit screen)
+# --------------------------------------------------------------------------- #
+class Clinic(BaseModel):
+    clinic_id: str
+    clinic_name: str
+    visit_type: str
+    visit_minutes: int = Field(ge=0)
+    stop_id: str
+    is_demo_anchor: bool
+
+
+class ClinicsResponse(BaseModel):
+    clinics: list[Clinic]
+    sources: list[SourceRef]
+
+
+class BlockGroupFeature(BaseModel):
+    bg_geoid: str
+    lat: float
+    lon: float
+    carless_adults: int = Field(ge=0)
+    share: float = Field(ge=0.0, le=1.0)
+    desert: bool
+
+
+class BlockGroupsResponse(BaseModel):
+    features: list[BlockGroupFeature]
+    sources: list[SourceRef]
+
+
 class WhatIfShift(_Strict):
     block: str = Field(pattern=r"^(mon|tue|wed|thu|fri|sat|sun)-\d{2}$", examples=["mon-08"])
     to: int = Field(ge=0, le=23, description="New start hour, 24h local.")
