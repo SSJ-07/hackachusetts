@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Hook #5 — postToolUse (@gtfs-mcp) provenance logger.
 
-After a @gtfs-mcp tool call, append one JSON line to docs/provenance.jsonl so
+After a @gtfs-mcp tool call, append one JSON line to docs/provenance-log.jsonl so
 every piece of transit data used can be traced to the call that produced it
 (AGENTS.md §3, "every number carries a source and vintage").
 
@@ -25,7 +25,7 @@ import os
 import sys
 from pathlib import Path
 
-LOG_PATH_DEFAULT = "docs/provenance.jsonl"
+LOG_PATH_DEFAULT = "docs/provenance-log.jsonl"
 
 
 def _utc_now_iso() -> str:

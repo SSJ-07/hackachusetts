@@ -180,7 +180,7 @@ class TestBlockLiveRouting:
 # --------------------------------------------------------------------------- #
 class TestLogProvenance:
     def test_appends_one_line_with_sources(self, tmp_path):
-        log = tmp_path / "docs" / "provenance.jsonl"
+        log = tmp_path / "docs" / "provenance-log.jsonl"
         ev = {
             "hook_event_name": "postToolUse",
             "tool_name": "@gtfs-mcp/trip_plan",

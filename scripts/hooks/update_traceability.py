@@ -3,7 +3,7 @@
 
 Invoked by the `traceability-post-task` IDE hook. It scans every spec's
 requirements for requirement ids, finds the tests/code that reference each id,
-and writes docs/traceability.md: a table
+and writes docs/traceability-matrix.md: a table
 
     requirement id | spec | property / test names (files) | status
 
@@ -40,7 +40,7 @@ PY_TEST_GLOBS = ("tests/**/*.py",)
 WEB_TEST_GLOBS = ("web/src/**/*.test.ts", "web/src/**/*.test.tsx",
                   "web/src/**/*.test.js", "web/src/**/*.test.jsx")
 
-OUT_PATH = "docs/traceability.md"
+OUT_PATH = "docs/traceability-matrix.md"
 
 
 @dataclass

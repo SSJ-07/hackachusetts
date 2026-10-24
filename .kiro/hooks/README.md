@@ -38,12 +38,12 @@ The hook receives a JSON event on stdin (`hook_event_name`, `cwd`, `tool_name`,
 | 2 | remind-templates | `userPromptSubmit` | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/remind_templates.py` — remind: patient-facing text only from reviewed templates |
 | 3 | guard-templates | `preToolUse` (matcher `write`) | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/guard_templates.py` — **exit 2** if a `planner/templates/**` write does not also move `planner/templates/signoff.json` |
 | 4 | block-live-routing | `preToolUse` (matchers `shell`, `web`) | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/block_live_routing.py` — **exit 2** on `maps.googleapis.com`, OSRM, or Mapbox Directions; message `use gtfs-mcp` |
-| 5 | log-provenance | `postToolUse` (matcher `@gtfs-mcp`) | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/log_provenance.py` — append one JSON line `{ts, tool, input, sources?, session}` to `docs/provenance.jsonl` |
+| 5 | log-provenance | `postToolUse` (matcher `@gtfs-mcp`) | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/log_provenance.py` — append one JSON line `{ts, tool, input, sources?, session}` to `docs/provenance-log.jsonl` |
 | 6 | (Prince's hook #6) | — | — | — | **Prince** | (owned by Prince — not created here) |
 | 7 | a11y-on-web-save | `fileEdited` (matcher `web/**`) | ✅ verified | IDE `.kiro.hook` | this task (W2) | `cd web && npm run a11y` |
 | 8 | validate-gtfs-on-create | `fileCreated` | ⚠️ **UNVERIFIED** | IDE `.kiro.hook` | this task (W2) | `scripts/hooks/validate_gtfs.py <path>` — structural GTFS check |
 | 9 | data-freshness-pre-task | `preTaskExecution` | ⚠️ **UNVERIFIED** | IDE `.kiro.hook` | this task (W2) | `scripts/hooks/check_data_fresh.py` — warn only, exit 0 always |
-| 10 | traceability-post-task | `postTaskExecution` | ✅ verified | IDE `.kiro.hook` | this task (W2) | `scripts/hooks/update_traceability.py` — regenerate `docs/traceability.md` |
+| 10 | traceability-post-task | `postTaskExecution` | ✅ verified | IDE `.kiro.hook` | this task (W2) | `scripts/hooks/update_traceability.py` — regenerate `docs/traceability-matrix.md` |
 | 11 | (journal hooks, existing) | `fileEdited` + `postTaskExecution` | ✅ verified | IDE `.kiro.hook` × 2 | existing | `journal-on-spec-steering-save` + `journal-on-task-finish` → `scripts/log_kiro.py` |
 
 Notes:
@@ -104,4 +104,4 @@ All under `scripts/hooks/` (unit-tested in `tests/unit/test_hook_scripts.py`):
 | `log_provenance.py` | postToolUse JSON on stdin (`PROVENANCE_LOG` overrides path) | exit 0; appends one JSONL line |
 | `validate_gtfs.py` | a feed path (`.zip` or dir) as `argv[1]` | 0 valid, 1 invalid |
 | `check_data_fresh.py` | `data/raw/manifest.json` (`DATA_ROOT` overrides root) | **always exit 0**; warns on stderr |
-| `update_traceability.py` | `.kiro/specs/*/requirements.md` + tests (`TRACE_ROOT` overrides root) | 0; writes `docs/traceability.md` |
+| `update_traceability.py` | `.kiro/specs/*/requirements.md` + tests (`TRACE_ROOT` overrides root) | 0; writes `docs/traceability-matrix.md` |
