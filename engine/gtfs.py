@@ -189,6 +189,62 @@ class Timetable:
         )
         return tt.index()
 
+    # ---- multi-feed loader (PVTA + FRTA) ---------------------------------
+
+    @classmethod
+    def from_gtfs_dirs(
+        cls,
+        feeds: dict[str, str],
+        date: str,
+        default_min_transfer: int = 60,
+        max_interagency_walk_m: float = 400.0,
+        walk_m_per_min: float = 80.0,
+    ) -> "Timetable":
+        """Load several GTFS directories into ONE Timetable, resolved to `date`.
+
+        `feeds` maps an agency key -> directory path, e.g.
+            {"pvta": "data/cache/pvta", "frta": "data/manual/frta_minigtfs"}
+
+        Every id (stop/trip/route/transfer endpoint) is prefixed by its agency key
+        ("pvta:1053", "frta:JWO") so ids from different feeds never collide (MF-1).
+        Each feed's own calendar/calendar_dates decide which trips are active (MF-2).
+        Walking transfers are added between stops of DIFFERENT agencies within
+        `max_interagency_walk_m` (MF-3). Times are never wrapped (MF-4).
+        """
+        merged = cls(service_date=date, default_min_transfer=default_min_transfer)
+        per_agency_stops: dict[str, list[Stop]] = {}
+        for agency, path in feeds.items():
+            sub = cls.from_gtfs_dir(path, date, default_min_transfer=default_min_transfer)
+            p = f"{agency}:"
+            for sid, s in sub.stops.items():
+                ns = Stop(stop_id=p + sid, lat=s.lat, lon=s.lon, name=s.name,
+                          wheelchair_boarding=s.wheelchair_boarding)
+                merged.stops[ns.stop_id] = ns
+                per_agency_stops.setdefault(agency, []).append(ns)
+            for tid, t in sub.trips.items():
+                merged.trips[p + tid] = Trip(trip_id=p + tid, route_id=p + t.route_id,
+                                             service_id=p + t.service_id,
+                                             wheelchair_accessible=t.wheelchair_accessible)
+            for st in sub.stop_times:
+                merged.stop_times.append(StopTime(trip_id=p + st.trip_id, seq=st.seq,
+                                                   stop_id=p + st.stop_id, arr=st.arr, dep=st.dep))
+            for tf in sub.transfers:
+                merged.transfers.append(Transfer(p + tf.from_stop, p + tf.to_stop,
+                                                 tf.min_transfer_time))
+
+        # Cross-agency walking transfers (MF-3): only between DIFFERENT agencies.
+        agencies = list(per_agency_stops)
+        for i in range(len(agencies)):
+            for j in range(i + 1, len(agencies)):
+                for a in per_agency_stops[agencies[i]]:
+                    for b in per_agency_stops[agencies[j]]:
+                        d = haversine_m(a.lat, a.lon, b.lat, b.lon)
+                        if d <= max_interagency_walk_m:
+                            secs = int(math.ceil(d * 1.3 / walk_m_per_min * 60))
+                            merged.transfers.append(Transfer(a.stop_id, b.stop_id, secs))
+                            merged.transfers.append(Transfer(b.stop_id, a.stop_id, secs))
+        return merged.index()
+
 
 def _active_services(path: str, date: str) -> set[str]:
     """Service_ids active on the ISO date, honouring calendar + calendar_dates."""
