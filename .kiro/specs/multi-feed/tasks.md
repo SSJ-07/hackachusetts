@@ -17,8 +17,12 @@
 - [x] 7a. Wired `pipeline/build_cube.py` to load a merged PVTA+FRTA Timetable when the FRTA
   feed is present (falls back to PVTA-only), and to resolve bare PVTA clinic ids to their
   `pvta:` form. Compiles clean.
-- [ ] 7b. RUN `python pipeline/build_cube.py --clinic CHCFC_GREENFIELD`. BLOCKED: needs the
-  data caches — `data/cache/pvta/`, `origins.parquet`, `stops_walk.parquet` — which are
-  git-ignored and built by `make data` (M2's downloads + Census key). Not present on this
-  machine. Run once the caches exist.
+- [x] 7b. Built and merged. `pipeline/stage_feeds.py` stages `data/cache/pvta` (from
+  `data/raw/pvta_gtfs.zip`) and `data/cache/frta` (from `data/manual/frta_minigtfs`);
+  `build_cube.py`/`stops_walk.py` prefer `data/cache/frta`, fall back to the committed feed.
+  `build_cube.py --clinic CHCFC_GREENFIELD --out data/cache/cubes/CHCFC_GREENFIELD.parquet`
+  then `merge_cubes.py`: CHCFC_GREENFIELD 42,504 cells, 11.3% reachable; BAY_GI_SPRINGFIELD
+  unchanged at 31.1% (PVTA-only number preserved). `make data` must call
+  `pipeline/stage_feeds.py` after `get_data.py`; the Greenfield row in `clinic_stops.csv`
+  is then built with every other clinic.
 - [ ] 8. M1 review of the `engine/gtfs.py` addition before merge.
