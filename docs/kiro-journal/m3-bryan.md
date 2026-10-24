@@ -25,3 +25,8 @@ outcome: 431 tests green on Python 3.12; validate_manual OK
 what: Phase A: staged PVTA+FRTA into data/cache, built+merged Greenfield cube (multi-feed 7b); GTFS validator reports for both feeds, every notice triaged
 kiro: Crew wrote pipeline/stage_feeds.py, ran build_cube --out + merge_cubes, ran gtfs-validator 8.0.1 and wrote docs/validation/README.md
 outcome: Greenfield 11.3% / BAY_GI 31.1% reachable; PVTA 522 errors (all shapes, unused), FRTA 0 errors; 477 tests green
+
+## 2026-10-24 19:09 · m3-bryan · Crew · topic: pbt
+what: VP-23 plan_b templates (EN/ES, unsigned) + VP-24 volunteer-driver window data, wired into planner/ with properties
+kiro: Crew wrote driver_windows.py, plan_b.py, solver wiring, 5 Hypothesis properties + unit tests; web-sourced 2 usable windows (Hadley, Southampton), 1 labelled gap
+outcome: 500 tests green; plan_b stays null until a human signs signoff.json
