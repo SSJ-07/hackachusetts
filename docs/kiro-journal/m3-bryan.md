@@ -20,3 +20,8 @@ outcome: 395 tests green; Greenfield cube rebuilt identical (42,504 cells, 11.3%
 what: Merged main into M3-Bryan; resolved build_cube.py docstring conflict; untracked accidental 'data/cache copy/' (46 MB); pinned ortools/numpy/pandas/pyarrow/pyshp
 kiro: Crew resolved the conflict, fixed deps, rebuilt BAY_GI_SPRINGFIELD cube (31.1% reachable, matches main's ~31%)
 outcome: 431 tests green on Python 3.12; validate_manual OK
+
+## 2026-10-24 18:58 · m3-bryan · Crew · topic: other
+what: Phase A: staged PVTA+FRTA into data/cache, built+merged Greenfield cube (multi-feed 7b); GTFS validator reports for both feeds, every notice triaged
+kiro: Crew wrote pipeline/stage_feeds.py, ran build_cube --out + merge_cubes, ran gtfs-validator 8.0.1 and wrote docs/validation/README.md
+outcome: Greenfield 11.3% / BAY_GI 31.1% reachable; PVTA 522 errors (all shapes, unused), FRTA 0 errors; 477 tests green
