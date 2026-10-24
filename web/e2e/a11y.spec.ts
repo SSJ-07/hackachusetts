@@ -61,7 +61,10 @@ test("Audit screen with the Suggest panel open has no serious/critical violation
 
   // Open suggestions so the panel's controls are scanned too.
   await page.getByRole("button", { name: /Suggest changes/i }).click();
-  await expect(page.locator(".suggest-list, .notice, .status")).toBeVisible();
+  // The fixture returns suggestions, so wait for the list itself. (A broad
+  // ".notice" selector also matched the map's "not loaded" notice on CI runners
+  // without WebGL -> strict-mode violation.)
+  await expect(page.locator(".suggest-list")).toBeVisible();
 
   const results = await scan(page);
   const blocking = seriousOrCritical(results.violations);
