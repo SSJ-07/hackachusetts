@@ -70,6 +70,37 @@ def test_leaving_exactly_at_shift_end_is_allowed():
     assert kinds(plan) == [OptionKind.SLOT]
 
 
+# ---- childcare window (VP-20) --------------------------------------------- #
+def test_slot_overlapping_childcare_window_is_dropped():
+    # No work shift, but a childcare window 15:00-18:00. The trip leaves at 15:30,
+    # inside the window, so the slot must not be recommended.
+    s = slot(16)
+    b = barriers(shift=None, childcare_window=(15, 18))
+    plan = plan_visit(PATIENT, TRANSIT_RULE, barriers=b, candidate_slots=[s],
+                      round_trip=round_trips({s: trip(15.5, 17.5)}))
+    assert kinds(plan) == [OptionKind.NONE]
+    assert plan.options[0].why == REASONS["none_shift"]
+
+
+def test_slot_outside_childcare_window_is_allowed():
+    # Childcare window 15:00-18:00; the trip is entirely before it (09:00-11:00).
+    s = slot(9.5)
+    b = barriers(shift=None, childcare_window=(15, 18))
+    plan = plan_visit(PATIENT, TRANSIT_RULE, barriers=b, candidate_slots=[s],
+                      round_trip=round_trips({s: trip(9, 11)}))
+    assert kinds(plan) == [OptionKind.SLOT]
+
+
+def test_childcare_window_blocks_untimed_escort_ride():
+    # Escort ride with no travel estimate + a childcare window -> cannot verify, dropped.
+    s = slot(16)
+    b = barriers(shift=None, childcare_window=(15, 18))
+    plan = plan_visit(PATIENT, ESCORT_RULE, barriers=b, candidate_slots=[s],
+                      round_trip=round_trips({}))
+    assert kinds(plan) == [OptionKind.NONE]
+    assert plan.options[0].why == REASONS["none_escort"]
+
+
 def test_overnight_shift_and_after_midnight_trip():
     # Shift 22:00-06:00. A trip arriving home at 24:30 (88200 s) overlaps it.
     intervals = shift_intervals((22, 6))

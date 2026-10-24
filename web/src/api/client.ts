@@ -10,6 +10,9 @@ import type {
   BlockGroupsResponse,
   ClinicsResponse,
   Day,
+  PlanRequest,
+  PlanResponse,
+  ProvenanceResponse,
   SuggestResponse,
   WhatIfRequest,
 } from "./types";
@@ -150,6 +153,28 @@ export function getRural(
   if (town) q.set("town", town);
   const qs = q.toString();
   return request<RuralResponse>(`/rural${qs ? `?${qs}` : ""}`, { signal });
+}
+
+/** POST /plan — build a Visit Planner plan (M4). Synthetic patient only. */
+export function postPlan(
+  body: PlanRequest,
+  signal?: AbortSignal,
+): Promise<PlanResponse> {
+  return request<PlanResponse>(`/plan`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+}
+
+/** GET /provenance?id — the "How we know this is right" drawer source (M4). */
+export function getProvenance(
+  id: string,
+  signal?: AbortSignal,
+): Promise<ProvenanceResponse> {
+  const q = new URLSearchParams({ id });
+  return request<ProvenanceResponse>(`/provenance?${q.toString()}`, { signal });
 }
 
 export const apiBase = BASE;

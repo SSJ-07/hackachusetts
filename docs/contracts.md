@@ -145,7 +145,14 @@ Build a Visit Planner plan. `patient` is synthetic only.
   "visit_type": "colonoscopy",
   "barriers": {
     "has_transport": false, "work_shift": [7, 15], "childcare": false,
-    "has_escort": true, "cost_worry": true, "language": "es"
+    "has_escort": true, "cost_worry": true, "language": "es",
+    // OPTIONAL childcare window (M4, VP-20). When the patient must be home to
+    // care for someone, the plan SHALL NOT recommend a slot/ride whose
+    // door-to-door window (travel included) overlaps this window.
+    // Hours are 24h local; a window may cross midnight (e.g. {start:22,end:6}).
+    // Omit the key when there is no window; `childcare: true` without a window
+    // still flags the need but applies no time constraint.
+    "childcare_window": { "start": 15, "end": 18 }
   }
 }
 // response

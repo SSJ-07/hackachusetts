@@ -124,7 +124,112 @@
   },
   "planner": {
     "title": "Planificador de visitas",
-    "placeholder": "Planificador de visitas — a cargo de M4"
+    "intro": "Responda seis preguntas rápidas. Le mostramos maneras de lograr esta visita — y cómo ir y volver.",
+    "logisticsNote": "Esto es ayuda para llegar. Su equipo de atención decide su atención.",
+    "synthetic": "Este es un paciente de práctica. No se usan datos reales.",
+    "illustrative": "Ilustrativo — aún no respaldado por datos reales.",
+    "step": "Paso {{n}} de {{total}}",
+    "pickVisit": {
+      "legend": "¿Qué tipo de visita es?",
+      "hint": "Elija una.",
+      "next": "Empezar las preguntas"
+    },
+    "barrier": {
+      "title": "Seis preguntas rápidas",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "submit": "Ver el plan",
+      "yes": "Sí",
+      "no": "No",
+      "transport": {
+        "q": "¿Tiene el paciente una forma confiable de ir y volver de esta visita?",
+        "help": "Un carro, un viaje seguro, o una forma que ya usa."
+      },
+      "work_shift": {
+        "q": "¿El horario de trabajo dificulta algunas horas del día?",
+        "none": "Sin horario fijo de trabajo",
+        "has": "Sí, estas horas:",
+        "start": "Hora de inicio",
+        "end": "Hora de fin"
+      },
+      "childcare": {
+        "q": "¿El paciente debe cuidar a un niño o a otra persona?",
+        "none": "No",
+        "has": "Sí, durante estas horas:",
+        "start": "El cuidado empieza",
+        "end": "El cuidado termina",
+        "help": "No elegiremos una hora que choque con este horario."
+      },
+      "escort": {
+        "q": "¿Puede otro adulto acompañarlo y ayudarlo a volver a casa?",
+        "help": "Algunas visitas lo requieren. El paciente no puede volver solo."
+      },
+      "cost": {
+        "q": "¿Le preocupa el costo de llegar — el pasaje o la gasolina?"
+      },
+      "language": {
+        "q": "¿En qué idioma deben estar los papeles de la visita?",
+        "en": "Inglés",
+        "es": "Español"
+      }
+    },
+    "plan": {
+      "loading": "Creando el plan…",
+      "error": "No se pudo crear el plan.",
+      "retry": "Intentar de nuevo",
+      "heading": "Maneras de lograr esta visita",
+      "reason": "Por qué",
+      "whichReason": "Razón",
+      "optionKinds": {
+        "slot": "Tomar el autobús",
+        "ride": "Conseguir un viaje con ayuda",
+        "tele": "Visita por teléfono o video",
+        "prep": "Hoja de preparación",
+        "none": "Necesita un navegante"
+      },
+      "recommended": "Mejor opción",
+      "recurrence": "Esta visita se repite unas {{count}} veces por semana. Planee el mismo viaje cada vez."
+    },
+    "itinerary": {
+      "title": "Su viaje",
+      "out": "Para ir",
+      "ret": "Para volver",
+      "walk": "Caminar",
+      "bus": "Autobús {{route}}",
+      "from": "desde {{stop}}",
+      "to": "hasta {{stop}}",
+      "at": "a las {{time}}",
+      "lastBus": "El último autobús a casa sale a las {{time}}.",
+      "none": "No hay viaje en autobús para esta opción."
+    },
+    "phone": {
+      "title": "Vista de teléfono",
+      "help": "Una vista pequeña que puede leer al paciente."
+    },
+    "pt1": {
+      "title": "Formulario de viaje (PT-1) — borrador",
+      "note": "Este es un borrador para ayudar a llenar el formulario. Aún no se ha enviado.",
+      "toComplete": "para que una persona lo complete",
+      "empty": "Este plan no necesita formulario de viaje."
+    },
+    "provenance": {
+      "open": "Cómo lo sabemos",
+      "title": "Cómo sabemos que esto es correcto",
+      "loading": "Cargando…",
+      "notFound": "No se encontró la fuente de este número.",
+      "source": "Fuente",
+      "vintage": "Año",
+      "requirement": "Regla",
+      "properties": "Comprobaciones",
+      "specLink": "Ver la regla",
+      "close": "Cerrar",
+      "status": {
+        "pass": "Pasa",
+        "fail": "Falla",
+        "pending": "Aún sin comprobar"
+      }
+    },
+    "largeType": "Texto grande"
   },
   "about": {
     "title": "Acerca de Slot-to-Stop",

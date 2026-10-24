@@ -123,14 +123,19 @@ class BarriersIn(_Strict):
     has_escort: bool
     cost_worry: bool
     language: LangCode
+    childcare_window: list[int] | None = Field(
+        default=None,
+        description="[start_hour, end_hour], 24h local (VP-20). Optional. May cross "
+        "midnight (e.g. [22, 6]). No slot/ride whose travel window overlaps this is recommended.",
+    )
 
-    @field_validator("work_shift")
+    @field_validator("work_shift", "childcare_window")
     @classmethod
     def _valid_shift(cls, value: list[int] | None) -> list[int] | None:
         if value is None:
             return value
         if len(value) != 2 or not all(0 <= h <= 24 for h in value):
-            raise ValueError("work_shift must be [start_hour, end_hour] with hours in 0..24")
+            raise ValueError("must be [start_hour, end_hour] with hours in 0..24")
         return value
 
 
