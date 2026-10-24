@@ -1,0 +1,19 @@
+fare_product_id,fare_product_name,fare_media_id,amount,currency
+1ride,One Ride,cash,1.50,USD
+1ride,One Ride,mobile,1.50,USD
+1day,One Day Pass,physical,3.50,USD
+1day,One Day Pass,mobile,3.50,USD
+7day,7 Day Pass,physical,15.00,USD
+7day,7 Day Pass,mobile,15.00,USD
+31day,Standard 31 Day Pass,physical,54.00,USD
+31day,Standard 31 Day Pass,mobile,54.00,USD
+free,Fare-Free,,0.00,USD
+transfer,Transfer,physical,0.25,USD
+transfer,Transfer,mobile,0.25,USD
+transfer,Transfer,cash,0.25,USD
+AmhArea,PVTA service area,mobile,1.50,USD
+B79_350,One-way within Quaboag Valley,mobile,3.50,USD
+B79_600,One-way Amherst/Worcester to Quaboag Valley,mobile,6.00,USD
+B79_900,One-way Amherst/Worcester,mobile,9.00,USD
+Link413_full_mobile,One Trip - Full Fare,mobile,10.00,USD
+Link413_full_cash,One Trip - Full Fare,cash,10.00,USD
