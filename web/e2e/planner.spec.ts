@@ -9,8 +9,6 @@ import { expect, test, type Page, type Route } from "@playwright/test";
  * PT-1 pre-fill. /provenance answers the RT-8 round-trip rule.
  */
 
-const SOURCES = [{ name: "PVTA GTFS", vintage: "2026-09-18" }];
-
 // Maria: escort required -> RIDE first, never a SLOT (VP-5 / UP-3.4).
 const PLAN_RESPONSE = {
   options: [
@@ -189,7 +187,7 @@ test("Spanish run has no raw i18n keys (UP-P3)", async ({ page }) => {
   await mockPlannerApi(page);
   await page.goto("/#/planner");
   // Switch to Spanish via the header language switch.
-  await page.getByRole("button", { name: "ES" }).click();
+  await page.getByRole("button", { name: "ES", exact: true }).click();
   await runBarrierCheck(page);
   await expect(page.locator(".plan-view")).toBeVisible();
   // No un-resolved keys like "planner.plan.heading" leak to the DOM.
