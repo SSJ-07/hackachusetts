@@ -9,7 +9,7 @@ from fastapi import FastAPI, Request
 
 from api import __version__
 from api.deps import data_mode
-from api.routers import audit, clinics, plan, provenance, suggest, whatif
+from api.routers import audit, clinics, plan, provenance, report, suggest, whatif
 from api.schemas import HealthResponse
 
 
@@ -40,6 +40,7 @@ def create_app() -> FastAPI:
     app.include_router(suggest.router)  # M1 (optimizer -> Suggest panel)
     app.include_router(plan.router)  # M4
     app.include_router(provenance.router)  # M4
+    app.include_router(report.router)  # M3 (CHNA PDF report)
 
     return app
 
