@@ -21,20 +21,20 @@
     {
       "path": "planner/templates/es/itinerary.md",
       "lang": "es",
-      "reviewer": null,
-      "reviewed": false,
-      "date": null,
+      "reviewer": "Bryan",
+      "reviewed": true,
+      "date": "2026-10-24",
       "reading_level_target": "grade-6",
-      "translation_status": "draft-ai-assisted"
+      "translation_status": "human-reviewed"
     },
     {
       "path": "planner/templates/es/prep_sheet.md",
       "lang": "es",
-      "reviewer": null,
-      "reviewed": false,
-      "date": null,
+      "reviewer": "Bryan",
+      "reviewed": true,
+      "date": "2026-10-24",
       "reading_level_target": "grade-6",
-      "translation_status": "draft-ai-assisted"
+      "translation_status": "human-reviewed"
     }
   ]
 }

@@ -28,7 +28,7 @@ status: populated
 
 visit_types:
   colonoscopy:
-    label: { en: "Colonoscopy (after a positive FIT)", es: null }
+    label: { en: "Colonoscopy (after a positive FIT)", es: "Colonoscopia (tras un FIT positivo)" }
     duration: 180           # 2-3h total on-site incl. prep arrival + sedation recovery (typical)
     escort_required: true   # sedation => responsible adult must escort home; transit-only never valid
     telehealth_ok: false    # in-person procedure
@@ -41,7 +41,7 @@ visit_types:
       status: verified
 
   prenatal:
-    label: { en: "Prenatal visit", es: null }
+    label: { en: "Prenatal visit", es: "Visita prenatal" }
     duration: 30            # routine prenatal check-in, no procedure/recovery (typical)
     escort_required: false  # routine visit, no sedation
     telehealth_ok: true     # some prenatal touchpoints are telehealth-eligible; exam/ultrasound are not
@@ -55,7 +55,7 @@ visit_types:
     note: "duration + telehealth_ok are routine-visit typicals; ultrasound/exam subtypes differ. Clinic ops may refine."
 
   dialysis:
-    label: { en: "Dialysis", es: null }
+    label: { en: "Dialysis", es: "Dialisis" }
     duration: 240           # ~3-4h in-center hemodialysis session (excludes transit)
     escort_required: false  # standard hemodialysis; transport need is patient-specific, not visit-type-specific
     telehealth_ok: false    # in-center treatment
@@ -68,7 +68,7 @@ visit_types:
       status: verified
 
   chemo:
-    label: { en: "Chemotherapy / infusion", es: null }
+    label: { en: "Chemotherapy / infusion", es: "Quimioterapia / infusion" }
     duration: 180           # TYPICAL mid-range; infusion chair time is regimen-specific (~2-6h+)
     escort_required: true   # many regimens cause fatigue/reactions; escort commonly advised
     telehealth_ok: false    # in-person infusion
