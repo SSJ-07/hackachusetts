@@ -45,17 +45,24 @@ Branch: `M3-Bryan`. Owner: M3. `[x]` done · `[ ]` open · `[~]` scaffold only.
 - [x] 6.2 Create `planner/templates/signoff.json`, every template `reviewed:false`.
 - [ ] 6.3 **[MANUAL]** Bilingual human reviewer signs off each template; set
   `reviewed:true`, fill `reviewer` + `date`. _Why manual: 45 CFR 92.201(c)(3) requires
-  human-reviewed patient text._
+  human-reviewed patient text._ _Status: itinerary + prep_sheet (EN, ES) marked reviewed by
+  "Bryan" — valid for ES only if that reviewer is fluent in Spanish; `plan_b` (EN, ES) is
+  new and still `reviewed:false`._
 - [ ] 6.4 Run a reading-level check (target grade-6) on EN + approved ES.
 
 ## 7. Fact-check list (R7)
 - [x] 7.1 Create `docs/sources.md` — 5 `(verify)` claims, candidate sources, statuses.
-- [ ] 7.2 **[MANUAL]** Lock one citable FIT follow-up rate (candidate: 50% @ 6mo,
-  PubMed 39843790) and mark it `verified`.
+- [x] 7.2 **[MANUAL]** Lock one citable FIT follow-up rate (candidate: 50% @ 6mo,
+  PubMed 39843790) and mark it `verified`. _Done: `docs/sources.md` §1, verified._
 - [ ] 7.3 **[MANUAL]** Read the Baystate CHNA PDF and cite the transportation page.
-- [ ] 7.4 **[MANUAL]** Confirm current MassHealth flexible-services scope + date.
-- [ ] 7.5 **[MANUAL]** Confirm CMS dialysis dataset shift fields from its data dictionary.
-- [ ] 7.6 **[MANUAL]** Confirm per-clinic sedated-discharge escort policy (may need a call).
+  _Quote verified (`docs/sources.md` §3); page number still open — the 2025 BFMC CHNA PDF
+  returns 403 to scripts, so a person must open it and record the page._
+- [x] 7.4 **[MANUAL]** Confirm current MassHealth flexible-services scope + date. _`docs/sources.md` §4._
+- [x] 7.5 **[MANUAL]** Confirm CMS dialysis dataset shift fields from its data dictionary.
+  _`docs/sources.md` §5 (field exists; exact DFCC column name not pinned)._
+- [x] 7.6 **[MANUAL]** Confirm per-clinic sedated-discharge escort policy (may need a call).
+  _Done without a call: Baystate's colonoscopy page requires a responsible adult to drive
+  the patient home (`docs/sources.md` §2). CHCFC Greenfield has no sedated procedure._
 
 ## 8. FRTA mini-GTFS (R8, stretch)
 - [~] 8.1 Scaffold `data/manual/frta_minigtfs/` with `agency.txt` + README.
