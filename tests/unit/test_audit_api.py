@@ -184,3 +184,24 @@ def test_clinics_lists_clinic_stops(client):
     ids = {c["clinic_id"] for c in r.json()["clinics"]}
     assert "BAY_GI_SPRINGFIELD" in ids
     assert r.json()["sources"][0]["vintage"]
+
+
+# ---- GET /suggest (optimizer behind the Suggest panel) -------------------- #
+def test_suggest_moves_a_block_and_is_never_worse(client):
+    r = client.get("/suggest", params={"clinic": CLINIC, "day": "thu", "k": 1, "blocks": "9"})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["suggested_score"] >= body["baseline_score"]
+    assert body["baseline_blocks"] == [9]
+    for ch in body["changes"]:
+        assert ch["change"]["block"] == "thu-09" and ch["sources"]
+
+
+def test_suggest_rejects_bad_blocks_and_unknown_clinic(client):
+    assert client.get("/suggest", params={"clinic": CLINIC, "day": "thu", "blocks": "x"}).status_code == 422
+    assert client.get("/suggest", params={"clinic": "NOPE", "day": "thu"}).status_code == 404
+
+
+def test_suggest_unavailable_in_mock_mode(monkeypatch):
+    monkeypatch.setenv("SLOT_TO_STOP_DATA", "mock")
+    assert TestClient(create_app()).get("/suggest", params={"clinic": "c", "day": "mon"}).status_code == 503

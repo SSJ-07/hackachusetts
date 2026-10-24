@@ -1,0 +1,9 @@
+{
+  "name": "validate-gtfs-on-create",
+  "description": "When a GTFS feed is added (a .zip, a gtfs/ tree, or the manual FRTA mini-GTFS), run a structural check (required files + columns present; stop_times times parse HH:MM:SS allowing hours >= 24). UNVERIFIED TRIGGER: 'fileCreated' is NOT one of the two IDE trigger names confirmed in this repo (fileEdited, postTaskExecution) — see .kiro/hooks/README.md. If the IDE does not support fileCreated, fall back to fileEdited on the same matcher or rely on CI. File hooks fire only on agent/IDE edits, so CI repeats this check.",
+  "trigger": "fileCreated",
+  "matcher": "**/*.zip,**/gtfs/**,data/manual/frta_minigtfs/**",
+  "action": "python scripts/hooks/validate_gtfs.py \"${KIRO_FILE}\"",
+  "timeout": 60,
+  "enabled": true
+}

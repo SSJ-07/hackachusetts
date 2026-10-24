@@ -57,6 +57,29 @@
       "sun": "Sun"
     }
   },
+  "suggest": {
+    "title": "Suggest a better schedule",
+    "intro": "Pick the blocks you run now, and we propose up to three moves that would let more car-less adults reach this clinic.",
+    "blocksLegend": "Your current blocks",
+    "blocksHint": "Choose the hours this clinic currently opens on {{day}}.",
+    "run": "Suggest changes",
+    "loading": "Finding better slots…",
+    "empty": "No better moves found for these blocks.",
+    "error": "Could not get suggestions.",
+    "needsData": "Schedule suggestions need real data. This demo runs on synthetic data, so suggestions are turned off here.",
+    "retry": "Try again",
+    "illustrative": "Illustrative — not yet backed by real data.",
+    "change": "Move {{block}} to {{hour}}",
+    "gainPeople": "+{{count}} more car-less adults reached",
+    "gainVisitHours": "+{{hours}} visit-hours of reach",
+    "sourcesLabel": "Sources for this suggestion",
+    "preview": "Preview this move",
+    "previewing": "Previewing…",
+    "previewTitle": "Preview: {{block}} → {{hour}}",
+    "before": "Before",
+    "after": "After",
+    "delta": "Change"
+  },
   "equity": {
     "title": "Who is reached",
     "share": "Can reach",

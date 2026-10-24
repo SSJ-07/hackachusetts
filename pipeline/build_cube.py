@@ -18,7 +18,9 @@ Clinics resolve to PVTA stops via data/manual/clinic_stops.csv (clinic_id -> sto
 because the manual clinic files carry addresses, not coordinates. Missing clinics are
 skipped with a warning rather than guessed (every number has a real source).
 
-Run:  python pipeline/build_cube.py [--date 2026-11-12] [--clinic BAY_GI_SPRINGFIELD]
+Run:  python pipeline/build_cube.py [--date 2026-11-12] [--clinic BAY_GI_SPRINGFIELD] [--out PATH]
+      Parallel: one process per clinic with --out data/cache/cubes/<clinic>.parquet,
+      then python pipeline/merge_cubes.py
 """
 
 from __future__ import annotations
@@ -108,13 +110,18 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--date", default="2026-11-12", help="anchor date (weekday mapping); inside feed window")
     ap.add_argument("--clinic", default=None, help="build only this clinic_id")
+    ap.add_argument("--out", default=None,
+                    help="output parquet (default data/cache/cube.parquet). Use one file per clinic "
+                         "(data/cache/cubes/<clinic>.parquet) when building clinics in parallel, "
+                         "then run pipeline/merge_cubes.py")
     args = ap.parse_args()
     df = build_cube(args.date, args.clinic)
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(OUT, index=False)
+    out = Path(args.out) if args.out else OUT
+    out.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out, index=False)
     n_clin = df.clinic_id.nunique()
     reach = int(df.reachable.sum())
-    print(f"[ ok ] wrote {OUT.relative_to(ROOT)}: {len(df):,} cells, {n_clin} clinic(s)")
+    print(f"[ ok ] wrote {out}: {len(df):,} cells, {n_clin} clinic(s)")
     print(f"       reachable cells: {reach:,} / {len(df):,} ({reach/max(len(df),1):.1%})")
 
 

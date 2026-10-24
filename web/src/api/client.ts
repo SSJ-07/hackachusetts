@@ -9,6 +9,7 @@ import type {
   BlockGroupsResponse,
   ClinicsResponse,
   Day,
+  SuggestResponse,
   WhatIfRequest,
 } from "./types";
 
@@ -111,6 +112,26 @@ export function getBlockGroups(
     `/audit/blockgroups?${q.toString()}`,
     { signal },
   );
+}
+
+export interface SuggestQuery {
+  clinic: string;
+  day: Day;
+  /** top-k changes to return (1..10). Defaults to 3. */
+  k?: number;
+  /** the clinic's CURRENT block start hours for that day, e.g. [7, 8, 17]. */
+  blocks?: number[];
+}
+
+/** GET /suggest?clinic&day&k&blocks — top-k schedule changes (optimizer).
+ * Returns 503 in mock mode (no real cube): the UI shows "needs real data". */
+export function getSuggest(
+  { clinic, day, k = 3, blocks }: SuggestQuery,
+  signal?: AbortSignal,
+): Promise<SuggestResponse> {
+  const q = new URLSearchParams({ clinic, day, k: String(k) });
+  if (blocks && blocks.length > 0) q.set("blocks", blocks.join(","));
+  return request<SuggestResponse>(`/suggest?${q.toString()}`, { signal });
 }
 
 export const apiBase = BASE;
