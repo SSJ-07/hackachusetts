@@ -23,7 +23,9 @@ Clinics resolve to PVTA stops via data/manual/clinic_stops.csv (clinic_id -> sto
 because the manual clinic files carry addresses, not coordinates. Missing clinics are
 skipped with a warning rather than guessed (every number has a real source).
 
-Run:  python pipeline/build_cube.py [--date 2026-11-12] [--clinic BAY_GI_SPRINGFIELD]
+Run:  python pipeline/build_cube.py [--date 2026-11-12] [--clinic BAY_GI_SPRINGFIELD] [--out PATH]
+      Parallel: one process per clinic with --out data/cache/cubes/<clinic>.parquet,
+      then python pipeline/merge_cubes.py
 """
 
 from __future__ import annotations
@@ -149,17 +151,22 @@ def main() -> None:
     ap.add_argument("--clinic", default=None, help="build only this clinic_id (other clinics' rows are kept)")
     ap.add_argument("--workers", type=int, default=max(1, min(12, (os.cpu_count() or 2) - 2)),
                     help="worker processes, one (clinic, day, hour) per job (default: up to 12)")
+    ap.add_argument("--out", default=None,
+                    help="output parquet (default data/cache/cube.parquet). Use one file per clinic "
+                         "(data/cache/cubes/<clinic>.parquet) when building clinics in parallel, "
+                         "then run pipeline/merge_cubes.py")
     args = ap.parse_args()
     df = build_cube(args.date, args.clinic, args.workers)
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    if args.clinic and OUT.exists():
+    out = Path(args.out) if args.out else OUT
+    out.parent.mkdir(parents=True, exist_ok=True)
+    if args.clinic and out.exists():
         # Rebuilding one clinic must not wipe the others: replace only its rows.
-        old = pd.read_parquet(OUT)
+        old = pd.read_parquet(out)
         df = pd.concat([old[old.clinic_id != args.clinic], df], ignore_index=True)
-    df.to_parquet(OUT, index=False)
+    df.to_parquet(out, index=False)
     n_clin = df.clinic_id.nunique()
     reach = int(df.reachable.sum())
-    print(f"[ ok ] wrote {OUT.relative_to(ROOT)}: {len(df):,} cells, {n_clin} clinic(s)")
+    print(f"[ ok ] wrote {out}: {len(df):,} cells, {n_clin} clinic(s)")
     print(f"       reachable cells: {reach:,} / {len(df):,} ({reach/max(len(df),1):.1%})")
 
 

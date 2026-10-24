@@ -195,3 +195,24 @@ def test_p19_itinerary_integrity(scenario):
         assert it.last_bus_home is None
     # plan_b text is template-only (M3); never machine-generated here.
     assert it.plan_b is None
+
+
+@given(scenarios())
+def test_p22_recurrence_plan_on_top_option(scenario):
+    """VP-22: when the visit type recurs (recurrence_per_week set) and a real option is
+    offered, the top option carries a structured recurrence plan with the rulebook
+    cadence; a one-off visit never gets one."""
+    rule = scenario[0]
+    plan = run(scenario)
+    top = plan.options[0]
+    has_recurrence = "recurrence" in top.details
+    if rule.recurrence_per_week and top.kind is not OptionKind.NONE:
+        assert has_recurrence
+        rec = top.details["recurrence"]
+        assert rec["per_week"] == rule.recurrence_per_week
+        assert rec["repeats"] is True
+        if top.kind is OptionKind.RIDE:
+            assert rec.get("pt1_once_per_destination") is True
+    else:
+        # No recurrence block for a one-off visit or a none-only plan.
+        assert not has_recurrence

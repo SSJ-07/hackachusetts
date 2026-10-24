@@ -10,6 +10,7 @@ import type { AuditResponse, Clinic, Day } from "../api/types";
 import { DAYS, blockKey, deltaPts, hourLabel, pct } from "../lib/scale";
 import { WeekGrid } from "../components/WeekGrid";
 import { DayRibbon } from "../components/DayRibbon";
+import { SuggestPanel } from "../components/SuggestPanel";
 import { EquityPanel } from "../components/EquityPanel";
 import { BlockGroupMap } from "../components/BlockGroupMap";
 import { SourcesFooter } from "../components/SourcesFooter";
@@ -246,6 +247,7 @@ export function Audit() {
 
           <div className="panels">
             <DayRibbon day={focusDay} cells={data.cells} />
+            <SuggestPanel clinic={clinic} day={day} cells={data.cells} />
             <EquityPanel equity={data.equity} />
             <BlockGroupMap />
           </div>

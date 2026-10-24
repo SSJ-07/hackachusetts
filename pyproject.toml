@@ -30,6 +30,13 @@ dev = [
     "ortools==9.15.6755",  # CP-SAT oracle for the schedule-optimizer property tests
     "pytest==9.1.1",
 ]
+pipeline = [
+    # data pipeline (origins, stops_walk, cube) — not needed to run the API with mocks
+    "pandas",
+    "numpy",
+    "pyarrow",
+    "pyshp",  # build_origins.py reads TIGER block-group shapefiles
+]
 
 [tool.setuptools.packages.find]
 include = ["api*", "planner*"]

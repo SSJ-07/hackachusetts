@@ -55,3 +55,4 @@ coverage.xml
 # Editor
 .idea/
 *.swp
+data/cache copy/

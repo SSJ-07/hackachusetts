@@ -5,3 +5,12 @@ Write entries with: `python scripts/log_kiro.py --member m4-kevin --tool <IDE|CL
 Assemble the whole team's log with: `python scripts/log_kiro.py --assemble`
 
 <!-- LOG ENTRIES BELOW — newest at the bottom -->
+
+## 2026-10-24 16:57 · m4-kevin · Crew · topic: spec
+what: Wire real-mode /plan (clinic_schedules.csv slots, pt1 inventory), real /provenance from provenance.jsonl, traceability.md; Maria real-data contract test
+kiro: Crew read M3/M2 merged data shapes, built planner/slots.py + pt1 adapter + provenance loader
+outcome: 70 planner+contract+property tests green; task 11 still blocked on stops_walk.parquet
+
+## 2026-10-24 17:22 · m4-kevin · Crew · topic: spec
+what: Wire real engine.round_trip into /plan (Timetable-backed, cache-gated) and structured recurrence plan for dialysis/infusion
+outcome: 71 tests green, 1 skip (routing cache absent)

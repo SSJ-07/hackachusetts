@@ -21,6 +21,18 @@
   --scale-3: #5ec962;
   --scale-4: #fde725;
 
+  /* Ink for each step, chosen for >= 4.5:1 contrast on its own background
+     (WCAG 1.4.3). Dark viridis steps take white ink; light steps take dark. */
+  --scale-0-ink: #ffffff;   /* 15.2:1 on --scale-0 */
+  --scale-1-ink: #ffffff;   /* 7.6:1  on --scale-1 */
+  --scale-2-ink: #16181d;   /* 4.7:1  on --scale-2 */
+  --scale-3-ink: #16181d;   /* 8.5:1  on --scale-3 */
+  --scale-4-ink: #16181d;   /* 14.1:1 on --scale-4 */
+
+  /* No-data cell: mid grey with dark ink (5.7:1). */
+  --scale-na: #8a93a3;
+  --scale-na-ink: #16181d;
+
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
