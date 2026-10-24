@@ -1,32 +1,33 @@
 # data/manual/frta_minigtfs/
 
-STRETCH (task 16). A hand-encoded mini-GTFS for 1-2 FRTA fixed routes, built from
-FRTA's published PDF timetables. This is a SCAFFOLD only — the stop_times are NOT
-encoded yet because FRTA timetables are PDFs that could not be fetched automatically
-(the fetch returned "unsupported content type: application/pdf").
+The **full published FRTA GTFS feed** — not a hand-encoded mini-feed. The original
+task (R8) was a stretch goal to hand-encode 1-2 routes from PDF timetables; that is
+now unnecessary because FRTA publishes a complete, official GTFS feed. We use it
+directly.
 
-## GTFS files to produce (minimal viable set)
-- `agency.txt`        — FRTA agency row (done below as a starter)
-- `stops.txt`         — stop_id, stop_name, stop_lat, stop_lon  (HAND-ENCODE from timetable + map)
-- `routes.txt`        — route_id, route_short_name, route_long_name, route_type=3
-- `calendar.txt`      — service_id, weekday flags, start/end date
-- `trips.txt`         — route_id, service_id, trip_id
-- `stop_times.txt`    — trip_id, arrival_time, departure_time, stop_id, stop_sequence
+## Source / provenance
+- **Agency:** Franklin Regional Transit Authority (GTFS `agency_id` 961)
+- **Publisher:** Trillium Solutions, Inc. (FRTA's official GTFS vendor)
+- **Obtained via:** Mobility Database feed `mdb-429` (snapshot `202608140033`)
+- **Feed version:** UTC 13-Aug-2026; `feed_id` frta-ma-us
+- **Service window:** 2026-03-01 → 2027-02-28 (see `calendar.txt`)
+- **Routes (7):** 20 GreenLink, 21 Greenfield, 23 Sunderland, 24 Crosstown Connector,
+  31 Northampton, 32 Orange, 41 Charlemont
 
-## CRITICAL ENCODING RULE (from steering/tech.md)
-GTFS times are "HH:MM:SS" and MAY EXCEED 24:00:00 for trips past midnight.
-Downstream the engine converts to seconds since local midnight and MUST NOT wrap
-past 86400. Encode e.g. 24:30:00, never 00:30:00, for a 12:30am arrival on a late trip.
+## Layout
+Standard GTFS text files at the top level of this folder (`stops.txt`, `stop_times.txt`,
+`trips.txt`, `routes.txt`, `calendar.txt`, `calendar_dates.txt`, `shapes.txt`, plus
+Trillium extension files). The folder name keeps the historical `frta_minigtfs` for the
+R8 task reference, but the contents are the FULL feed.
 
-## MISSING / MANUAL-CHECK — why this must be done by hand
-1. FRTA route timetables are PDF scans at frta.org. Automated fetch is blocked
-   (application/pdf unsupported), so a human must open the PDF for the chosen route(s)
-   and transcribe every timepoint. WHY MANUAL: the source is an un-fetchable PDF.
-2. Stop coordinates (stop_lat/stop_lon) are not in the timetable. A human must geocode
-   each named stop from a map. WHY MANUAL: requires reading a map / geocoder per stop.
-3. Service calendar: confirm which days each trip runs and the service period dates
-   from the timetable header. WHY MANUAL: on the PDF only.
-4. Pick which 1-2 routes to encode (likely the Greenfield-anchored routes serving the
-   audit clinics). WHY MANUAL: a scoping decision for the demo.
+## Engine notes (steering/tech.md)
+- GTFS times may exceed 24:00:00 for past-midnight trips; the engine converts to seconds
+  since local midnight and MUST NOT wrap past 86400. The published feed already encodes
+  these correctly — do not "fix" them.
+- `calendar.txt` + `calendar_dates.txt` define active service days; resolve service for a
+  date from both (RT-7 in the raptor-router spec).
 
-Candidate source index: https://www.frta.org/  (Routes & Schedules -> individual PDFs)
+## MANUAL-CHECK — resolved
+- Hand-encoding is NO LONGER NEEDED (R8 stretch goal satisfied by the official feed).
+- Refresh: re-download the latest `mdb-429` snapshot from the Mobility Database when the
+  service window rolls over (after 2027-02-28).
