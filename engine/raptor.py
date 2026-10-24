@@ -136,6 +136,122 @@ def earliest_arrival(
     return _run_raptor(tt, srcs, {}, limits)
 
 
+# --------------------------------------------------------------------------
+# Backward RAPTOR: latest departure that still arrives by a deadline.
+# Symmetric to the forward search — ride trips from alight back to board,
+# maximising the departure time at each stop. One-to-many from the TARGET
+# stops (e.g. a clinic) to every origin, in a single scan: exactly the
+# "reverse profile" search M2 needs to build the reachability cube.
+# --------------------------------------------------------------------------
+# A backward label: the LATEST time you can leave this stop and still make it,
+# plus the legs (recorded forward: earliest leg first).
+BLabel = tuple[int, list[Leg]]
+
+
+def _run_raptor_backward(
+    tt: Timetable,
+    targets: dict[str, int],  # stop_id -> latest time you may ARRIVE there (the deadline)
+    limits: Limits,
+) -> dict[str, BLabel]:
+    """Latest-departure RAPTOR toward a set of target stops.
+
+    `targets[stop] = t` means "arriving at `stop` by `t` is success". Returns,
+    per stop, the LATEST departure time (and legs) from which you can still
+    reach a target within <= limits.max_transfers trips.
+    """
+    # best[stop] = (latest_departure_from_stop, legs_from_here_to_a_target)
+    best: dict[str, BLabel] = {s: (t, []) for s, t in targets.items()}
+    _relax_transfers_backward(tt, best, set(targets))
+    marked: set[str] = set(best)
+
+    for _round in range(limits.max_transfers + 1):
+        if not marked:
+            break
+        improved: set[str] = set()
+        for trip_id, sts in tt.trip_stop_times.items():
+            # scan the trip in REVERSE: pick an alighting stop we can use, then
+            # ride backward to every earlier stop, maximising its departure.
+            alight_st = None
+            alight_label: BLabel | None = None
+            for st in reversed(sts):  # from last seq to first
+                if alight_st is None:
+                    cur = best.get(st.stop_id)
+                    if cur is None:
+                        continue
+                    latest_ok = cur[0]
+                    # transfer buffer if the onward leg from here is a bus
+                    if cur[1] and cur[1][0].kind == "bus":
+                        latest_ok -= tt.min_transfer_time(st.stop_id, st.stop_id)
+                    # we may alight here if the bus ARRIVES by latest_ok
+                    if st.arr <= latest_ok:
+                        alight_st = st
+                        alight_label = cur
+                    continue
+                # riding backward: board at st (earlier seq), departing st.dep
+                assert alight_label is not None and alight_st is not None
+                if alight_st.arr - st.dep > limits.max_leg_seconds:
+                    continue
+                prev = best.get(st.stop_id)
+                if prev is None or st.dep > prev[0]:
+                    leg = Leg(
+                        kind="bus",
+                        from_stop=st.stop_id,
+                        to_stop=alight_st.stop_id,
+                        route_id=tt.trips[trip_id].route_id if trip_id in tt.trips else None,
+                        dep=st.dep,
+                        arr=alight_st.arr,
+                    )
+                    best[st.stop_id] = (st.dep, [leg] + list(alight_label[1]))
+                    improved.add(st.stop_id)
+        _relax_transfers_backward(tt, best, improved)
+        marked = improved
+    return best
+
+
+def _relax_transfers_backward(tt: Timetable, best: dict[str, BLabel], to_stops: set[str]) -> None:
+    """Relax foot transfers INTO `to_stops` (backward): if you can be at B by
+    `best[B]`, then you can leave A by `best[B] - transfer` and walk to B."""
+    queue = list(to_stops)
+    while queue:
+        b = queue.pop()
+        cur = best.get(b)
+        if cur is None:
+            continue
+        latest_b, legs_b = cur
+        # a transfer A->B lets us start at A at (latest_b - transfer_time)
+        for a, tlist in tt.transfers_from.items():
+            for tr in tlist:
+                if tr.to_stop != b:
+                    continue
+                latest_a = latest_b - tr.min_transfer_time
+                prev = best.get(a)
+                if prev is None or latest_a > prev[0]:
+                    leg = Leg(kind="walk", from_stop=a, to_stop=b, route_id=None,
+                              dep=latest_a, arr=latest_b)
+                    best[a] = (latest_a, [leg] + list(legs_b))
+                    to_stops.add(a)
+                    queue.append(a)
+
+
+def latest_departure(
+    tt: Timetable,
+    to_stops: dict[str, int],
+    date: str,
+    arrive_by: int | None = None,
+    limits: Limits = DEFAULT_LIMITS,
+) -> dict[str, BLabel]:
+    """One-to-many REVERSE profile search.
+
+    Given target stops and the time by which you must arrive (`arrive_by`, or a
+    per-stop deadline in `to_stops`), return the LATEST departure (and legs) from
+    every stop that still reaches a target within the limits. This is the reverse
+    half of the cube: the latest a patient may leave home and still check in on
+    time. Pair it with `earliest_arrival` from the clinic for the return home.
+    """
+    targets = {s: (min(t, arrive_by) if arrive_by is not None else t) for s, t in to_stops.items()}
+    return _run_raptor_backward(tt, targets, limits)
+
+
 def one_way(
     tt: Timetable,
     origin_stops: list[tuple[str, int]],  # (stop_id, walk_seconds) at the origin
