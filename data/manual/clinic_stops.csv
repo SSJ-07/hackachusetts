@@ -1,0 +1,4 @@
+clinic_id,clinic_name,stop_id,stop_name,visit_type,visit_minutes,source,is_demo_anchor
+BAY_GI_SPRINGFIELD,Baystate GI / Endoscopy,1053,Chestnut / Baystate Medical Center,colonoscopy,180,"PVTA GTFS stop nearest Baystate Medical Center (2026-09 feed)",TRUE
+HOLYOKE_MEDICAL,Holyoke Medical Center,456,Holyoke Medical Center,prenatal,60,"PVTA GTFS stop at Holyoke Medical Center (2026-09 feed)",TRUE
+MERCY_SPRINGFIELD,Mercy Medical Center,1161,Mercy Medical Center,primary_care,30,"PVTA GTFS stop at Mercy Medical Center (2026-09 feed)",TRUE

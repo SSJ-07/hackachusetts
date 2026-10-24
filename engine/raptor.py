@@ -50,19 +50,24 @@ def _run_raptor(
     # (e.g. a transfer edge origin->dest) is found even with no bus ride.
     _relax_transfers(tt, best, set(sources))
 
-    marked: set[str] = set(best)
+    # Stops reachable using STRICTLY FEWER than k buses, as of the start of round k.
+    # A round may only board trips from these, so round k adds the k-th bus and no
+    # more — this is what bounds the journey to <= max_transfers transfers. Reading
+    # a frozen snapshot (not the live `best`) stops one round from chaining several
+    # buses in a single pass.
+    reachable_prev: dict[str, Label] = dict(best)
 
     for _round in range(limits.max_transfers + 1):
-        if not marked:
+        if not reachable_prev:
             break
         improved: set[str] = set()
-        # Ride every trip we can board from a stop we have already reached.
+        # Ride every trip we can board from a stop reached in the PREVIOUS round.
         for trip_id, sts in tt.trip_stop_times.items():
             board_st = None  # the stop_time at which we boarded this trip
             board_label: Label | None = None
             for st in sts:  # sorted by seq
                 if board_st is None:
-                    cur = best.get(st.stop_id)
+                    cur = reachable_prev.get(st.stop_id)
                     if cur is None:
                         continue
                     ready = cur[0]
@@ -92,9 +97,10 @@ def _run_raptor(
                     )
                     best[st.stop_id] = (st.arr, legs)
                     improved.add(st.stop_id)
-        # foot transfers from stops improved this round
+        # foot transfers from stops improved this round (walks don't count as transfers)
         _relax_transfers(tt, best, improved)
-        marked = improved
+        # next round boards only from what THIS round newly reached
+        reachable_prev = {s: best[s] for s in improved}
     return best
 
 
