@@ -14,3 +14,8 @@ outcome: 70 planner+contract+property tests green; task 11 still blocked on stop
 ## 2026-10-24 17:22 · m4-kevin · Crew · topic: spec
 what: Wire real engine.round_trip into /plan (Timetable-backed, cache-gated) and structured recurrence plan for dialysis/infusion
 outcome: 71 tests green, 1 skip (routing cache absent)
+
+## 2026-10-24 18:55 · m4-kevin · Crew · topic: spec
+what: VP-20 childcare window (contract+solver+property) + ui-planner screen, provenance drawer, planner i18n EN/ES, e2e+axe
+kiro: Kiro merged main, added childcare_window end-to-end, wrote ui-planner Requirements-First spec, built the React planner flow and drawer
+outcome: 34 planner+contract tests green (2 real-data skips); i18n parity 161/161 keys; commits 0de502d + HEAD

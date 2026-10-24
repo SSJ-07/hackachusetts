@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any, Literal
 from fastapi import HTTPException, status
 
 from api import mocks
+from engine.paths import cache_dir
 from planner.models import CandidateSlot, VisitRule
 from planner.pt1 import Pt1Field, Pt1FieldsError, load_fields, load_fields_inventory
 from planner.rules import RulebookError, load_rules
@@ -34,8 +35,8 @@ REAL_RULES_PATH = REPO_ROOT / "planner" / "visit_rules.yaml"
 REAL_PT1_PATH = REPO_ROOT / "data" / "manual" / "pt1_fields.json"
 REAL_CLINIC_SCHEDULE_PATH = REPO_ROOT / "data" / "manual" / "clinic_schedules.csv"
 REAL_PROVENANCE_PATH = REPO_ROOT / "docs" / "provenance.jsonl"
-REAL_PVTA_DIR = REPO_ROOT / "data" / "cache" / "pvta"
-REAL_ORIGINS_PATH = REPO_ROOT / "data" / "cache" / "origins.parquet"
+REAL_PVTA_DIR = cache_dir() / "pvta"  # SLOT_TO_STOP_CACHE_DIR-aware (make demo)
+REAL_ORIGINS_PATH = cache_dir() / "origins.parquet"
 REAL_CLINIC_STOPS_PATH = REPO_ROOT / "data" / "manual" / "clinic_stops.csv"
 
 DataMode = Literal["mock", "real"]
@@ -90,6 +91,45 @@ def get_audit_data() -> AuditSource:
     except (FileNotFoundError, OSError) as exc:
         raise _unavailable("Reachability cube (data/cache/cube.parquet, M2)") from exc
     return AuditSource(mode="real", cube=cube, origins=origins)
+
+
+# --------------------------------------------------------------------------- #
+# /rural (M1) — rural lens
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class RuralSource:
+    """What /rural reads from: the cube + origins (as /audit) joined to towns and the
+    hand-collected rural tables. mock mode carries no frames (empty, labelled answer)."""
+
+    mode: DataMode
+    cube: "pd.DataFrame | None" = None
+    origins: "pd.DataFrame | None" = None
+    towns: "pd.DataFrame | None" = None
+    coverage: "pd.DataFrame | None" = None
+    options: "pd.DataFrame | None" = None
+
+
+@functools.lru_cache(maxsize=1)
+def _load_rural_tables() -> tuple["pd.DataFrame", "pd.DataFrame", "pd.DataFrame"]:
+    from engine import rural as engine_rural
+
+    if not engine_rural.towns_path().is_file():
+        raise FileNotFoundError
+    return engine_rural.load_towns(), engine_rural.load_coverage(), engine_rural.load_options()
+
+
+def get_rural_data() -> RuralSource:
+    if data_mode() == "mock":
+        return RuralSource(mode="mock")
+    try:
+        cube, origins = _load_cube_origins()
+    except (FileNotFoundError, OSError) as exc:
+        raise _unavailable("Reachability cube (data/cache/cube.parquet)") from exc
+    try:
+        towns, coverage, options = _load_rural_tables()
+    except (FileNotFoundError, OSError) as exc:
+        raise _unavailable("Rural lens (data/cache/bg_towns.parquet: run `make towns`)") from exc
+    return RuralSource(mode="real", cube=cube, origins=origins, towns=towns, coverage=coverage, options=options)
 
 
 # --------------------------------------------------------------------------- #

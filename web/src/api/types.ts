@@ -135,6 +135,90 @@ export interface SuggestResponse {
   sources: SuggestSource[];
 }
 
+// --------------------------------------------------------------------------- //
+// POST /plan (M4) — docs/contracts.md §3
+// --------------------------------------------------------------------------- //
+
+/** Synthetic patient only — never real PHI. */
+export interface PlanPatient {
+  id: string;
+  /** 12-digit Census block-group GEOID */
+  origin_bg: string;
+  lang: string;
+}
+
+/** Barrier-check answers. `work_shift` / `childcare_window` are [start, end] hours
+ * (24h local), may cross midnight, or null when not given (VP-20). */
+export interface PlanBarriers {
+  has_transport: boolean;
+  work_shift: [number, number] | null;
+  childcare: boolean;
+  has_escort: boolean;
+  cost_worry: boolean;
+  language: string;
+  childcare_window?: [number, number] | null;
+}
+
+export interface PlanRequest {
+  patient: PlanPatient;
+  visit_type: string;
+  barriers: PlanBarriers;
+}
+
+/** Fixed contract option kinds, in render order. */
+export type OptionKind = "slot" | "ride" | "tele" | "prep" | "none";
+
+/** One plan option. `details` is an open bag the API fills per kind. */
+export interface PlanOption {
+  kind: OptionKind;
+  details: Record<string, unknown>;
+  /** plain-language, logistics-only reason this option is offered */
+  why: string;
+}
+
+/** One journey leg (Leg, contracts.md §2). Times are seconds since local
+ * midnight and may exceed 86400 (never wrapped). */
+export interface PlanLeg {
+  kind: "walk" | "bus";
+  from_stop: string;
+  to_stop: string;
+  route_id: string | null;
+  dep: number;
+  arr: number;
+}
+
+export interface PlanItinerary {
+  out_legs: PlanLeg[];
+  ret_legs: PlanLeg[];
+  last_bus_home: number | null;
+  /** patient-facing; null until reviewed templates (M3) exist */
+  plan_b: string | null;
+}
+
+export interface PlanResponse {
+  options: PlanOption[];
+  itinerary: PlanItinerary;
+  pt1_prefill: Record<string, unknown>;
+}
+
+// --------------------------------------------------------------------------- //
+// GET /provenance?id (M4 with M1) — docs/contracts.md §3
+// --------------------------------------------------------------------------- //
+
+export type PropertyState = "pass" | "fail" | "pending";
+
+export interface ProvenanceProperty {
+  name: string;
+  status: PropertyState;
+}
+
+export interface ProvenanceResponse {
+  source: { name: string; vintage: string };
+  requirement_id: string;
+  properties: ProvenanceProperty[];
+  spec_link: string;
+}
+
 // --- Compile-time assertions that our hand types match the generated schema.
 // If the OpenAPI schema drifts from this file, one of these lines fails to
 // typecheck, which fails `npm run build`.
@@ -163,3 +247,55 @@ export type _BgOk = _AssertAssignable<
   components["schemas"]["BlockGroupsResponse"],
   BlockGroupsResponse
 >;
+
+/** GET /rural — rural lens (docs/contracts.md §3). */
+export type RuralVerdict = "transit" | "assisted_only" | "none" | "not_assessed";
+
+export interface RuralFeature {
+  bg_geoid: string;
+  town: string;
+  county: string;
+  lat: number;
+  lon: number;
+  carless_adults: number;
+  /** share of ALL cube cells (every clinic × day × hour) that are reachable, 0..1 */
+  transit_share: number;
+  /** no PVTA/FRTA stop within the walk limit */
+  desert: boolean;
+  verdict: RuralVerdict;
+  coverage_tier: string;
+}
+
+export interface RuralVerdictCount {
+  n_bg: number;
+  carless_adults: number;
+}
+
+export interface RuralSummary {
+  n_bg: number;
+  carless_adults: number;
+  by_verdict: Record<string, RuralVerdictCount>;
+}
+
+/** One town's row from the hand-collected rural tables, with its citation. */
+export interface RuralOption {
+  town: string;
+  county?: string | null;
+  coverage_tier?: string | null;
+  has_any_option: boolean;
+  dial_a_ride?: string | null;
+  coa_driver?: string | null;
+  pt1?: string | null;
+  source_url?: string | null;
+  verified_by?: string | null;
+  date?: string | null;
+}
+
+export interface RuralResponse {
+  town?: string | null;
+  features: RuralFeature[];
+  summary: RuralSummary;
+  options: RuralOption[];
+  towns_available: string[];
+  sources: SourceRef[];
+}

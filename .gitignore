@@ -56,3 +56,6 @@ coverage.xml
 .idea/
 *.swp
 data/cache copy/
+
+# frozen demo snapshots (rebuild with `make snapshot`)
+data/snapshots/

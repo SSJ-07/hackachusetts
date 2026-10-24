@@ -54,6 +54,9 @@ SIMPLE_DOWNLOADS = [
     ("portal_healthcare", "https://hackachusetts2026.vercel.app/kits/tracks/healthcare.zip",
      "portal_healthcare.zip", "portal_healthcare"),
     ("ej_west", EJ_URL, "ej_west.json", None),
+    # towns (MA county subdivisions) for the rural lens: block group -> town join
+    ("tiger_cousub", "https://www2.census.gov/geo/tiger/TIGER2024/COUSUB/tl_2024_25_cousub.zip",
+     "tiger_cousub.zip", "tiger_cousub"),
 ]
 
 # ---------------------------------------------------------------- helpers
@@ -126,6 +129,17 @@ def validate_tiger(folder: Path) -> dict:
         raise ValueError(f"TIGER has only {n} block groups; expected ~5,100 for MA")
     return {"block_groups_MA": n}
 
+def validate_cousub(folder: Path) -> dict:
+    needed = [folder / f"tl_2024_25_cousub.{ext}" for ext in ("shp", "dbf", "shx", "prj")]
+    missing = [p.name for p in needed if not p.exists()]
+    if missing:
+        raise ValueError(f"TIGER COUSUB missing {missing}")
+    with (folder / "tl_2024_25_cousub.dbf").open("rb") as f:
+        n = int.from_bytes(f.read(8)[4:8], "little")
+    if n < 300:
+        raise ValueError(f"TIGER COUSUB has only {n} rows; expected ~350 MA towns/cities")
+    return {"county_subdivisions_MA": n}
+
 def validate_portal(folder: Path) -> dict:
     for sub in ("ej", "hospitals"):
         if not (folder / sub / "data.csv").exists():
@@ -148,6 +162,7 @@ VALIDATORS = {
     "tiger_bg": lambda p, u: validate_tiger(u),
     "portal_healthcare": lambda p, u: validate_portal(u),
     "ej_west": lambda p, u: validate_ej(p),
+    "tiger_cousub": lambda p, u: validate_cousub(u),
 }
 
 # ---------------------------------------------------------------- steps

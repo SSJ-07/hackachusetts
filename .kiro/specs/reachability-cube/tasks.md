@@ -30,11 +30,11 @@ done**. Requirement ids in parentheses trace to `requirements.md`.
 
 ## Not done (explicit gaps)
 
-- [ ] **Multi-clinic cubes.** The cache holds exactly one clinic
+- [x] **Multi-clinic cubes** (2026-10-24): `data/cache/cubes/<clinic>.parquet` per clinic, merged by `pipeline/merge_cubes.py`; `make data` builds every clinic in `clinic_stops.csv` (4 today: Baystate GI 31.0%, Holyoke Medical 33.4%, Mercy 41.5%, CHCFC Greenfield via FRTA). Was: The cache holds exactly one clinic
   (`BAY_GI_SPRINGFIELD`). Building more clinics is supported by `build_cube.py` but has
   not been run; `/audit` for any other clinic returns 404 in real mode. (RC-1, RC-4)
-- [ ] **Build speedup.** The cube costs ~9 min/clinic (one `round_trip` per cell). No
+- [x] **Build speedup** (2026-10-24): `build_cube.py --workers` runs one (clinic, day, hour) job per process (~5 min/clinic at 8 workers) and clinics build as independent parquet parts — still one authoritative `round_trip` per cell, so no equality proof is needed. Was: The cube costs ~9 min/clinic (one `round_trip` per cell). No
   faster path is in place — the profile-search shortcut was discarded as inaccurate and
   must not return without a cell-for-cell equality proof. (RC-8)
-- [ ] **FRTA / other agencies.** Only the PVTA GTFS feed is modelled. FRTA and any other
+- [x] **FRTA / other agencies** (2026-10-24): `build_cube.py` loads a merged PVTA+FRTA Timetable (spec multi-feed) when `data/manual/frta_minigtfs/` is present; CHCFC Greenfield is anchored to an FRTA stop. Was: Only the PVTA GTFS feed is modelled. FRTA and any other
   regional transit agency are out of scope for the current cube. (RC-6)

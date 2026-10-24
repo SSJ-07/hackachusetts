@@ -401,3 +401,315 @@ button[aria-pressed="true"] {
     scroll-behavior: auto !important;
   }
 }
+
+/* ===================================================================== */
+/* Visit Planner (ui-planner). Tokens only — no literal hex.             */
+/* ===================================================================== */
+.planner-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.large-type-toggle {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: var(--fs-1);
+  color: var(--text-muted);
+}
+
+.notice {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--focus-ring);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text);
+  margin: var(--space-4) 0;
+}
+
+/* Large-type mode: bump the base type scale for the planner subtree only.
+   accessibility.md "large-type mode". Pure token override, keeps contrast. */
+.planner.large-type {
+  --fs-1: 1.05rem;
+  --fs-2: 1.25rem;
+  --fs-3: 1.45rem;
+  --fs-4: 1.8rem;
+  --fs-5: 2.25rem;
+  font-size: var(--fs-2);
+  line-height: 1.6;
+}
+
+/* Tap targets: buttons used as big one-tap answers (>= 44px, WCAG 2.5.8). */
+.tap {
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--fs-2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.tap[aria-pressed="true"],
+.tap[aria-checked="true"] {
+  border-color: var(--focus-ring);
+  background: var(--surface-2);
+  font-weight: 600;
+}
+
+.visit-types,
+.yesno {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+}
+
+.barrier-step {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+}
+.barrier-step legend {
+  font-size: var(--fs-3);
+  font-weight: 600;
+  padding: 0 var(--space-2);
+}
+.window-picker {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+.window-picker label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--fs-1);
+}
+.barrier-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+.btn-primary,
+.btn-secondary {
+  min-height: 44px;
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--fs-2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 2px solid var(--focus-ring);
+}
+.btn-primary {
+  background: var(--focus-ring);
+  color: var(--bg);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Options */
+.option-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.option {
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  background: var(--surface);
+}
+.option-slot { border-left-color: var(--scale-2); }
+.option-ride { border-left-color: var(--scale-1); }
+.option-tele { border-left-color: var(--scale-3); }
+.option-prep { border-left-color: var(--warn); }
+.option-none { border-left-color: var(--danger); }
+.option-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.option-icon {
+  font-size: var(--fs-4);
+}
+.option-kind {
+  font-size: var(--fs-3);
+  font-weight: 600;
+}
+.badge {
+  margin-left: auto;
+  font-size: var(--fs-1);
+  background: var(--focus-ring);
+  color: var(--bg);
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+}
+.option-why {
+  margin: var(--space-2) 0 0;
+}
+.option-why-label {
+  font-weight: 600;
+}
+.option-recurrence {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-1);
+  color: var(--text-muted);
+}
+
+/* Itinerary */
+.itin-cols {
+  display: flex;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+.legs {
+  padding-left: var(--space-5);
+}
+.leg-mode {
+  font-weight: 600;
+}
+.last-bus {
+  font-weight: 600;
+  color: var(--text);
+}
+.plan-b {
+  background: var(--surface-2);
+  padding: var(--space-3);
+  border-radius: var(--radius);
+}
+
+/* Phone-sized preview */
+.phone-frame {
+  width: 320px;
+  max-width: 100%;
+  border: 3px solid var(--border);
+  border-radius: 1.5rem;
+  padding: var(--space-4);
+  background: var(--bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+.phone-screen {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  min-height: 12rem;
+  background: var(--surface);
+}
+.phone-title {
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+}
+.phone-legs {
+  padding-left: var(--space-4);
+  font-variant-numeric: tabular-nums;
+}
+
+/* PT-1 summary */
+.pt1-list {
+  margin: var(--space-3) 0 0;
+}
+.pt1-row {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--surface-2);
+}
+.pt1-row dt {
+  font-weight: 600;
+  min-width: 10rem;
+}
+.pt1-row dd {
+  margin: 0;
+}
+.pt1-todo {
+  color: var(--text-muted);
+}
+
+/* Provenance drawer */
+.drawer-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 100;
+}
+.drawer {
+  width: min(28rem, 100%);
+  height: 100%;
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--text);
+  border-left: 1px solid var(--border);
+  padding: var(--space-5);
+}
+.drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+}
+.drawer-close {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.prov-list dt {
+  font-weight: 600;
+  margin-top: var(--space-3);
+  color: var(--text-muted);
+}
+.prov-list dd {
+  margin: 0;
+}
+.prov-props {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-2) 0 0;
+}
+.prov-prop {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+}
+.prov-shape {
+  font-weight: 700;
+  width: 1.25rem;
+  text-align: center;
+}
+.prov-pass .prov-shape { color: var(--ok); }
+.prov-fail .prov-shape { color: var(--danger); }
+.prov-pending .prov-shape { color: var(--warn); }
+.prov-spec {
+  font-size: var(--fs-1);
+  word-break: break-all;
+}
+
+.chip-button {
+  cursor: pointer;
+}
+.chip-icon {
+  font-weight: 700;
+}

@@ -55,6 +55,7 @@ barrier_sets = st.builds(
     has_escort=st.booleans(),
     cost_worry=st.booleans(),
     language=st.sampled_from(["en", "es"]),
+    childcare_window=shifts,
 )
 slots = st.builds(
     CandidateSlot,
@@ -126,12 +127,34 @@ def test_p16_no_recommended_slot_overlaps_shift(scenario):
         result = table[(ORIGIN, s.clinic_id, s.date, s.start)]
         window = travel_window(result)
         if window is None:
-            assert option.kind is OptionKind.RIDE and not barriers.work_shift_has_hours() if hasattr(
-                barriers, "work_shift_has_hours"
-            ) else option.kind is OptionKind.RIDE
-            assert barriers.work_shift is None or barriers.work_shift[0] == barriers.work_shift[1]
+            # Only a RIDE may be offered without a travel estimate, and only when
+            # there is no no-go band (work shift OR childcare window) to conflict with.
+            assert option.kind is OptionKind.RIDE
+            assert not _band_has_hours(barriers.work_shift)
+            assert not _band_has_hours(barriers.childcare_window)
         else:
+            # The recommended window must miss BOTH no-go bands (VP-6 shift, VP-20 childcare).
             assert not window_hits_shift(window, barriers.work_shift)
+            assert not window_hits_shift(window, barriers.childcare_window)
+
+
+def _band_has_hours(band: tuple[int, int] | None) -> bool:
+    return band is not None and band[0] != band[1]
+
+
+@given(scenarios())
+def test_p20_no_recommended_slot_overlaps_childcare_window(scenario):
+    """VP-20: no recommended slot/ride has a door-to-door window (travel included)
+    that overlaps the childcare window. Independent minute-by-minute oracle."""
+    _, barriers, cand, table, _ = scenario
+    by_iso = {(slot_iso(s), s.clinic_id): s for s in cand}
+    for option in run(scenario).options:
+        if option.kind not in (OptionKind.SLOT, OptionKind.RIDE):
+            continue
+        s = by_iso[(option.details["slot"], option.details["clinic_id"])]
+        window = travel_window(table[(ORIGIN, s.clinic_id, s.date, s.start)])
+        if window is not None:
+            assert not window_hits_shift(window, barriers.childcare_window)
 
 
 @given(scenarios())

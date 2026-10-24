@@ -34,12 +34,12 @@ The hook receives a JSON event on stdin (`hook_event_name`, `cwd`, `tool_name`,
 
 | # | Hook | Trigger | Trigger verified? | Lives in | Owner | Action |
 |---|------|---------|-------------------|----------|-------|--------|
-| 1 | journal-on-spec-steering-save | `fileEdited` | ✅ verified | IDE `.kiro.hook` | **Prince** | `scripts/log_kiro.py` — journal a steering/spec edit |
+| 1 | feed-expiry-on-session-start | `sessionStart` (IDE) + `agentSpawn` (CLI, on `slot-to-stop-dev`) | ⚠️ IDE trigger **UNVERIFIED**; CLI ✅ verified | IDE `.kiro.hook` + CLI agent | M1 | `scripts/hooks/check_data_fresh.py` — warn (never block) if the manifest is >7 days old or the PVTA feed ends within 14 days |
 | 2 | remind-templates | `userPromptSubmit` | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/remind_templates.py` — remind: patient-facing text only from reviewed templates |
 | 3 | guard-templates | `preToolUse` (matcher `write`) | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/guard_templates.py` — **exit 2** if a `planner/templates/**` write does not also move `planner/templates/signoff.json` |
 | 4 | block-live-routing | `preToolUse` (matchers `shell`, `web`) | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/block_live_routing.py` — **exit 2** on `maps.googleapis.com`, OSRM, or Mapbox Directions; message `use gtfs-mcp` |
 | 5 | log-provenance | `postToolUse` (matcher `@gtfs-mcp`) | ✅ verified (CLI) | CLI agent `slot-to-stop-dev` | this task (W2) | `scripts/hooks/log_provenance.py` — append one JSON line `{ts, tool, input, sources?, session}` to `docs/provenance-log.jsonl` |
-| 6 | (Prince's hook #6) | — | — | — | **Prince** | (owned by Prince — not created here) |
+| 6 | engine-fast-tests-on-save | `fileEdited` (matcher `engine/**`) | ✅ verified | IDE `.kiro.hook` | M1 | `pytest tests/property tests/golden tests/differential -q -x -m "not slow"` — fast router suite on every engine save; CI repeats it (`make test`) |
 | 7 | a11y-on-web-save | `fileEdited` (matcher `web/**`) | ✅ verified | IDE `.kiro.hook` | this task (W2) | `cd web && npm run a11y` |
 | 8 | validate-gtfs-on-create | `fileCreated` | ⚠️ **UNVERIFIED** | IDE `.kiro.hook` | this task (W2) | `scripts/hooks/validate_gtfs.py <path>` — structural GTFS check |
 | 9 | data-freshness-pre-task | `preTaskExecution` | ⚠️ **UNVERIFIED** | IDE `.kiro.hook` | this task (W2) | `scripts/hooks/check_data_fresh.py` — warn only, exit 0 always |
@@ -48,7 +48,7 @@ The hook receives a JSON event on stdin (`hook_event_name`, `cwd`, `tool_name`,
 
 Notes:
 
-- **#6** is owned by Prince and is intentionally not created by this task.
+- **#1 / #6** were reassigned from Prince (M2) to M1 and created on 2026-10-24.
 - **#11** refers to the two pre-existing journal hooks
   (`journal-on-spec-steering-save.kiro.hook`, `journal-on-task-finish.kiro.hook`),
   which are the reference `.kiro.hook` JSON shape the new IDE hooks copy.

@@ -55,7 +55,7 @@ REASONS: dict[str, str] = {
     "prep": "This visit type has a prep sheet. Attach the reviewed version in the preferred language.",
     "none_no_candidates": "No candidate slots were provided. Flag for a navigator to call.",
     "none_no_transit": "No candidate slot has a round trip by transit. Flag for a navigator to call.",
-    "none_shift": "Every reachable slot overlaps the work shift, including travel. "
+    "none_shift": "Every reachable slot overlaps the work shift or childcare window, including travel. "
     "Flag for a navigator to call.",
     "none_escort": "An escort-aware ride is needed, but no slot could be checked against the work "
     "shift including travel. Flag for a navigator to call.",
@@ -187,7 +187,13 @@ def plan_visit(
         )
 
     shift = shift_intervals(barriers.work_shift)
-    checked = _check(patient, rule, set(candidate_slots), round_trip, shift)
+    # VP-20: a childcare window is a second no-go band. A slot/ride whose
+    # door-to-door window (travel included) overlaps it is not recommended, for
+    # the same reason as the work shift — the patient must be home then. Both
+    # bands are checked together; overnight windows and trip times >= 86400 are
+    # handled by shift_intervals without wrapping.
+    blocked = shift + shift_intervals(barriers.childcare_window)
+    checked = _check(patient, rule, set(candidate_slots), round_trip, blocked)
 
     # VP-21: cost_worry and has_transport never change the FIXED kind order
     # (slot | ride | tele | prep | none, R6) and never gate an option out — doing
@@ -202,10 +208,10 @@ def plan_visit(
     attend: list[tuple[Option, _Checked | None]] = []
     if rule.escort_required:
         # R1: rides only. The transit round trip is used as a conservative travel-time
-        # proxy for the shift check; without any travel estimate the slot is only
-        # usable when there is no shift to conflict with.
+        # proxy for the no-go bands (work shift + childcare window); without any travel
+        # estimate the slot is only usable when there is no band to conflict with.
         for c in checked:
-            if c.shift_conflict or (c.window is None and shift):
+            if c.shift_conflict or (c.window is None and blocked):
                 continue
             details = {
                 "slot": slot_iso(c.slot),

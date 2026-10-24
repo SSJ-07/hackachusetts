@@ -182,22 +182,16 @@ unset GTFS_DIR GTFS_DATE
 
 (The two test clients live under the scratch power-test dir used for this run.)
 
-## Publish (you do this — no repo is created for you)
+## Published
 
-This power is meant to be published so others can "swap in any city's GTFS feed."
-**No GitHub repo was created by the build** — do it yourself:
+Public repo: [SSJ-07/slot-to-stop-power](https://github.com/SSJ-07/slot-to-stop-power)
+(release `v0.1.0`). It contains only this bundle — `plugin.json`, `mcp.json`,
+`README.md`, `skills/*.md`. No `.venv`, GTFS cache, or `.env`; `mcp.json` references
+env vars by name only.
 
-1. **Create a public GitHub repo**, e.g. `slot-to-stop-power` (or publish under a
-   `power/` path inside the main Slot-to-Stop repo).
-2. **Commit the bundle** — the contents of `power/slot-to-stop/`:
-   `plugin.json`, `mcp.json`, `README.md`, and `skills/*.md`. Do **not** commit the
-   engine `.venv`, the GTFS cache, or any `.env`.
-3. **Document the dependency**: the power needs the Slot-to-Stop engine checkout on
-   disk with its `.venv` built; `SLOT_TO_STOP_HOME` points at it. State the minimum
-   engine version/commit the tool shapes were verified against.
-4. **Do not commit secrets.** `mcp.json` references env vars by name only; there are
-   no tokens in this bundle. (`GTFS_DIR`/`GTFS_DATE`/`SLOT_TO_STOP_HOME` are paths,
-   not secrets.)
-5. Tag a release and point users at the Install section above.
+**Engine dependency:** tool shapes verified against Slot-to-Stop engine commit
+`f7fc0c2` (2026-10-24). Re-verified in a fresh workspace on 2026-10-24: both servers
+`initialize` + `tools/list`, `validate_feed` on PVTA returns `ok: true`, and
+`reachability(BAY_GI_SPRINGFIELD, thu)` returns hourly cells from the cube.
 
 Owner: M1.
