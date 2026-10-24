@@ -177,7 +177,9 @@ class Timetable:
                 for row in csv.DictReader(f):
                     if row.get("transfer_type") == "2" and row.get("min_transfer_time"):
                         transfers.append(
-                            Transfer(row["from_stop_id"], row["to_stop_id"], int(row["min_transfer_time"]))
+                            # Clamp to >= 0: a negative time would let a transfer cycle
+                            # (A->B->A) improve forever and hang the relax loops.
+                            Transfer(row["from_stop_id"], row["to_stop_id"], max(0, int(row["min_transfer_time"])))
                         )
         tt = cls(
             stops=stops,
