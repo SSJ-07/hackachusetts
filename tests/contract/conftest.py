@@ -18,6 +18,4 @@ def client(monkeypatch) -> TestClient:
 @pytest.fixture
 def maria_request() -> dict:
     """Synthetic patient 'Maria' (fictional composite). See api/mocks/plan_request_maria.json."""
-    data = json.loads((MOCKS / "plan_request_maria.json").read_text(encoding="utf-8"))
-    data.pop("_mock_notice")
-    return data
+    return json.loads((MOCKS / "plan_request_maria.json").read_text(encoding="utf-8"))

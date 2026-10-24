@@ -1,8 +1,9 @@
 """MOCK DATA for the H1 scaffold. Illustrative only: nothing here is computed or sourced.
 
-Every file in this folder carries a `_mock_notice` key (stripped before responses are
-built) and every mock source is named "MOCK ...". The server reports
-`X-Data-Mode: mock` on every response while mocks are active.
+See README.md in this folder. Data files carry a `_mock_notice` key (stripped before
+responses are built); request bodies don't, so they can be posted as-is. Every mock
+source is named "MOCK ...", and the server reports `X-Data-Mode: mock` on every
+response while mocks are active.
 
 Replace with real data as owners land it:
   audit.json / whatif   -> M2 (reachability cube)
