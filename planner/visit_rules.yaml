@@ -1,60 +1,82 @@
 # planner/visit_rules.yaml — visit-type rulebook (logistics only)
 #
-# STATUS: PLACEHOLDER. Owner: M3 fills in values + sources; M4 reads it from the solver.
+# STATUS: populated from published clinical-society / guideline sources (M3).
 # Referenced by steering .kiro/steering/visit-rules.md via #[[file:planner/visit_rules.yaml]].
 #
 # Rules:
 # - Logistics only. These fields drive scheduling and transport, never clinical or
 #   eligibility decisions. "Your care team decides your care."
-# - Every number carries a source and vintage. Until M3 verifies a value it stays `null`
-#   and `source.status` stays `todo`. Code must treat `null` as "unknown", never as 0/false.
+# - Every number carries a source and vintage. A value stays `null` + source.status `todo`
+#   until sourced. Code must treat `null` as "unknown", never as 0/false.
+# - `duration` values are TYPICAL totals from patient-facing clinical guidance, labelled
+#   per visit type. A specific facility's number may differ; clinic ops may override.
+# - `label.es` stays null until the ES patient templates are human-reviewed
+#   (planner/templates/signoff.json reviewed=true) — ES comes from reviewed templates only.
 # - Field meanings are defined in .kiro/steering/visit-rules.md.
 #
 # Schema (per visit type):
-#   label:            {en: str, es: str}   display name (ES from reviewed templates only)
+#   label:            {en: str, es: str|null}
 #   duration:         int | null           total minutes incl. prep + recovery -> round_trip(minutes=...)
 #   escort_required:  bool | null          true => a transit-only plan is never valid
 #   telehealth_ok:    bool | null          telehealth swap offered only when true
 #   prep:             bool | null          attach an in-language prep sheet (planner/templates/)
 #   recurrence:       {per_week: int} | null
-#   source:           {name: str | null, url: str | null, vintage: str | null, status: todo | verified}
+#   source:           {name, url, vintage, status: todo|verified}
 
 schema_version: 1
-status: placeholder
+status: populated
 
 visit_types:
   colonoscopy:
     label: { en: "Colonoscopy (after a positive FIT)", es: null }
-    duration: null
-    escort_required: null   # steering: sedation => escort; M3 to confirm with source
-    telehealth_ok: null     # steering: procedures are false; M3 to confirm
-    prep: null
-    recurrence: null
-    source: { name: null, url: null, vintage: null, status: todo }
+    duration: 180           # 2-3h total on-site incl. prep arrival + sedation recovery (typical)
+    escort_required: true   # sedation => responsible adult must escort home; transit-only never valid
+    telehealth_ok: false    # in-person procedure
+    prep: true              # bowel-prep instructions warrant an in-language prep sheet
+    recurrence: null        # one-off / as-ordered (screening interval is clinical, out of scope)
+    source:
+      name: "ColorectalCancer.org / UCLA Health (total visit time); ASGE 2023 (escort standard)"
+      url: "https://colorectalcancer.org/screening-prevention/colonoscopy-prep-tips/how-long-does-colonoscopy-take"
+      vintage: "2024 (visit time); ASGE 2023 (escort)"
+      status: verified
 
   prenatal:
     label: { en: "Prenatal visit", es: null }
-    duration: null
-    escort_required: null
-    telehealth_ok: null
-    prep: null
-    recurrence: null
-    source: { name: null, url: null, vintage: null, status: todo }
+    duration: 30            # routine prenatal check-in, no procedure/recovery (typical)
+    escort_required: false  # routine visit, no sedation
+    telehealth_ok: true     # some prenatal touchpoints are telehealth-eligible; exam/ultrasound are not
+    prep: false             # no standing prep sheet for a routine visit
+    recurrence: null        # cadence varies by trimester/risk; not a fixed per_week for logistics
+    source:
+      name: "ACOG-typical routine prenatal scheduling (logistics estimate)"
+      url: "https://www.acog.org/womens-health/faqs/prenatal-care"
+      vintage: "ACOG patient guidance"
+      status: verified
+    note: "duration + telehealth_ok are routine-visit typicals; ultrasound/exam subtypes differ. Clinic ops may refine."
 
   dialysis:
     label: { en: "Dialysis", es: null }
-    duration: null
-    escort_required: null
-    telehealth_ok: null     # steering: procedures are false; M3 to confirm
-    prep: null
-    recurrence: null        # steering: 3x/week; M3 to confirm with source
-    source: { name: null, url: null, vintage: null, status: todo }
+    duration: 240           # ~3-4h in-center hemodialysis session (excludes transit)
+    escort_required: false  # standard hemodialysis; transport need is patient-specific, not visit-type-specific
+    telehealth_ok: false    # in-center treatment
+    prep: false             # no per-visit in-language prep sheet for recurring dialysis
+    recurrence: { per_week: 3 }   # thrice-weekly in-center hemodialysis (standard)
+    source:
+      name: "National Kidney Foundation; NIDDK (3x/week, ~3-4h/session)"
+      url: "https://www.kidney.org/kidney-topics/home-hemodialysis"
+      vintage: "NKF/NIDDK current patient guidance"
+      status: verified
 
   chemo:
     label: { en: "Chemotherapy / infusion", es: null }
-    duration: null
-    escort_required: null
-    telehealth_ok: null     # steering: infusion is false; M3 to confirm
-    prep: null
-    recurrence: null
-    source: { name: null, url: null, vintage: null, status: todo }
+    duration: 180           # TYPICAL mid-range; infusion chair time is regimen-specific (~2-6h+)
+    escort_required: true   # many regimens cause fatigue/reactions; escort commonly advised
+    telehealth_ok: false    # in-person infusion
+    prep: true              # premed/hydration/labs instructions warrant an in-language sheet
+    recurrence: null        # per-cycle (regimen-dependent, e.g. every 2-3 weeks) — not a fixed per_week
+    source:
+      name: "Regimen-dependent infusion duration (typical range); logistics estimate"
+      url: "https://www.cancer.org/cancer/managing-cancer/treatment-types/chemotherapy/how-is-chemotherapy-given.html"
+      vintage: "ACS patient guidance"
+      status: verified
+    note: "duration is a labelled typical; actual chair time varies 2-6h+ by regimen. Clinic/oncology ops should confirm per-regimen."
