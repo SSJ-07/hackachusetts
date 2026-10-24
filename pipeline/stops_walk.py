@@ -32,6 +32,10 @@ ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / "data" / "cache"
 ORIGINS = CACHE / "origins.parquet"
 GTFS_ZIP = ROOT / "data" / "raw" / "pvta_gtfs.zip"
+# FRTA (rural Franklin County) feed, unzipped. Its stop ids are written with the
+# "frta:" prefix used by Timetable.from_gtfs_dirs; PVTA ids stay bare for
+# backward compatibility with existing consumers. (spec: multi-feed)
+FRTA_STOPS = ROOT / "data" / "manual" / "frta_minigtfs" / "stops.txt"
 OUT = CACHE / "stops_walk.parquet"
 
 MAX_WALK_M = 800.0       # max straight-line distance to a usable stop
@@ -40,18 +44,25 @@ METRES_PER_MIN = 80.0    # ~4.8 km/h walking speed
 EARTH_R = 6_371_000.0    # metres
 
 
-def load_stops() -> pd.DataFrame:
-    with zipfile.ZipFile(GTFS_ZIP) as z:
-        rows = list(csv.DictReader(io.TextIOWrapper(z.open("stops.txt"), "utf-8-sig")))
+def _parse_stops(rows, prefix: str = "") -> list[tuple[str, float, float]]:
     recs = []
     for r in rows:
         # location_type 0 or blank = a real boarding stop (skip stations/entrances).
         if (r.get("location_type") or "0").strip() not in ("", "0"):
             continue
-        lat, lon = r["stop_lat"].strip(), r["stop_lon"].strip()
+        lat, lon = (r.get("stop_lat") or "").strip(), (r.get("stop_lon") or "").strip()
         if not lat or not lon:
             continue
-        recs.append((r["stop_id"].strip(), float(lat), float(lon)))
+        recs.append((prefix + r["stop_id"].strip(), float(lat), float(lon)))
+    return recs
+
+
+def load_stops() -> pd.DataFrame:
+    with zipfile.ZipFile(GTFS_ZIP) as z:
+        recs = _parse_stops(csv.DictReader(io.TextIOWrapper(z.open("stops.txt"), "utf-8-sig")))
+    if FRTA_STOPS.exists():
+        with FRTA_STOPS.open(encoding="utf-8-sig", newline="") as f:
+            recs += _parse_stops(csv.DictReader(f), prefix="frta:")
     return pd.DataFrame(recs, columns=["stop_id", "stop_lat", "stop_lon"])
 
 

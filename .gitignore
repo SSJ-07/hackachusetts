@@ -39,6 +39,8 @@ yarn-error.log*
 # Small committed fixtures live in data/fixtures/ (NOT ignored).
 data/raw/
 data/cache/
+# accidental Explorer/Finder duplicates of the cache (e.g. "data/cache copy/")
+data/cache */
 *.osm.pbf
 *.parquet
 !data/fixtures/**
