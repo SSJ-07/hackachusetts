@@ -52,73 +52,83 @@ def earliest_arrival(
     depart_after: int | None = None,
     limits: Limits = DEFAULT_LIMITS,
 ) -> dict[str, Label]:
-    """Earliest arrival per stop via a single connection scan.
+    """Earliest arrival per stop via a single connection scan, exact under the
+    transfer cap.
 
-    Uses trip reachability: once any stop of a trip is boardable, the whole
-    downstream of that trip is reachable. Foot transfers are relaxed out of a
-    stop the moment that stop's arrival improves, so a transfer that unlocks a
-    later connection is seen within the one scan (connections are in dep order).
+    Labels are kept per **vehicle-leg level**: `arr[h][stop]` is the earliest arrival
+    at `stop` using at most `h` buses (h = 0 .. max_transfers + 1). A connection
+    boarded from level h writes level h + 1. One label per stop is NOT enough once
+    transfers are capped: the earliest-arriving label may already have used every
+    allowed bus, while a later-but-shorter label could still board onward — keeping
+    only the earliest one silently loses that stop's downstream (spec
+    bug-csa-transfer-cap, found by RAPTOR != CSA on the real PVTA feed).
+
+    Uses trip reachability per (trip, level): once any stop of a trip is boardable at
+    level h, the whole downstream of that trip is reachable at level h + 1. Foot
+    transfers are relaxed out of a stop the moment its arrival improves, at the same
+    level (walks are not vehicle legs), so a transfer that unlocks a later connection
+    is seen within the one scan (connections are in departure order).
     """
-    arr: dict[str, int] = {}
-    legs_to: dict[str, list[Leg]] = {}
-    hops: dict[str, int] = {}  # vehicle legs used to reach the stop
+    levels = limits.max_transfers + 1  # max vehicle legs
+    arr: list[dict[str, int]] = [{} for _ in range(levels + 1)]
+    legs_to: list[dict[str, list[Leg]]] = [{} for _ in range(levels + 1)]
 
-    def improve(stop: str, t: int, legs: list[Leg], h: int) -> bool:
-        if stop not in arr or t < arr[stop]:
-            arr[stop] = t
-            legs_to[stop] = legs
-            hops[stop] = h
-            return True
-        return False
+    def improve(h: int, stop: str, t: int, legs: list[Leg]) -> bool:
+        """Set level h's label and propagate it to every higher level (<= h semantics)."""
+        if stop in arr[h] and t >= arr[h][stop]:
+            return False
+        for lvl in range(h, levels + 1):
+            if stop not in arr[lvl] or t < arr[lvl][stop]:
+                arr[lvl][stop] = t
+                legs_to[lvl][stop] = legs
+        return True
 
-    def relax_transfers(stop: str) -> None:
-        # transitive foot-transfer closure out of `stop`
+    def relax_transfers(h: int, stop: str) -> None:
+        # transitive foot-transfer closure out of `stop`, staying on level h
         stack = [stop]
         while stack:
             s = stack.pop()
             for tr in tt.transfers_from.get(s, ()):
-                cand = arr[s] + tr.min_transfer_time
-                legs = legs_to[s] + [
-                    Leg(kind="walk", from_stop=s, to_stop=tr.to_stop, route_id=None, dep=arr[s], arr=cand)
+                cand = arr[h][s] + tr.min_transfer_time
+                legs = legs_to[h][s] + [
+                    Leg(kind="walk", from_stop=s, to_stop=tr.to_stop, route_id=None, dep=arr[h][s], arr=cand)
                 ]
-                if improve(tr.to_stop, cand, legs, hops[s]):
+                if improve(h, tr.to_stop, cand, legs):
                     stack.append(tr.to_stop)
 
     for s, t in from_stops.items():
         t0 = max(t, depart_after) if depart_after is not None else t
-        if improve(s, t0, [], 0):
-            relax_transfers(s)
+        if improve(0, s, t0, []):
+            relax_transfers(0, s)
 
-    # reachable[trip] = (board_stop, board_dep, legs_at_board, hops_at_board)
-    reachable_trip: dict[str, tuple[str, int, list[Leg], int]] = {}
+    # reachable[(trip, level boarded from)] = (board_stop, board_dep, legs_at_board)
+    reachable_trip: dict[tuple[str, int], tuple[str, int, list[Leg]]] = {}
 
     for c in _connections(tt):
-        board = None
-        # (a) continue a trip we already boarded
-        if c.trip_id in reachable_trip:
-            board = reachable_trip[c.trip_id]
-        # (b) or board it fresh at its dep stop if we are there in time
-        here = arr.get(c.dep_stop)
-        if here is not None and board is None:
-            ready = here + (tt.min_transfer_time(c.dep_stop, c.dep_stop)
-                            if (legs_to.get(c.dep_stop) and legs_to[c.dep_stop][-1].kind == "bus") else 0)
-            if c.dep >= ready and hops[c.dep_stop] + 1 <= limits.max_transfers + 1:
-                board = (c.dep_stop, c.dep, legs_to[c.dep_stop], hops[c.dep_stop])
-                reachable_trip[c.trip_id] = board
-        if board is None:
-            continue
-        board_stop, board_dep, board_legs, board_hops = board
-        if c.arr - board_dep > limits.max_leg_seconds:
-            continue
-        if board_hops + 1 > limits.max_transfers + 1:
-            continue
-        legs = board_legs + [
-            Leg(kind="bus", from_stop=board_stop, to_stop=c.arr_stop, route_id=c.route_id, dep=board_dep, arr=c.arr)
-        ]
-        if improve(c.arr_stop, c.arr, legs, board_hops + 1):
-            relax_transfers(c.arr_stop)
+        for h in range(levels):  # board from level h, arrive at level h + 1
+            key = (c.trip_id, h)
+            board = reachable_trip.get(key)
+            if board is None:
+                here = arr[h].get(c.dep_stop)
+                if here is None:
+                    continue
+                last = legs_to[h][c.dep_stop]
+                ready = here + (tt.min_transfer_time(c.dep_stop, c.dep_stop) if (last and last[-1].kind == "bus") else 0)
+                if c.dep < ready:
+                    continue
+                board = (c.dep_stop, c.dep, last)
+                reachable_trip[key] = board
+            board_stop, board_dep, board_legs = board
+            if c.arr - board_dep > limits.max_leg_seconds:
+                continue
+            legs = board_legs + [
+                Leg(kind="bus", from_stop=board_stop, to_stop=c.arr_stop, route_id=c.route_id, dep=board_dep, arr=c.arr)
+            ]
+            if improve(h + 1, c.arr_stop, c.arr, legs):
+                relax_transfers(h + 1, c.arr_stop)
 
-    return {s: (arr[s], legs_to.get(s, [])) for s in arr}
+    best = arr[levels]
+    return {s: (best[s], legs_to[levels].get(s, [])) for s in best}
 
 
 def _one_way(tt, origin_links, dest_links, depart_after, arrive_by, limits, o_label, d_label):

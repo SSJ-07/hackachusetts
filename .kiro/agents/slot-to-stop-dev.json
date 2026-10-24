@@ -1,6 +1,6 @@
 {
   "name": "slot-to-stop-dev",
-  "description": "General Slot-to-Stop development agent that carries the CLI guardrail hooks (#2 template reminder, #3 template-write guard, #4 live-routing blocker, #5 gtfs-mcp provenance log). Deterministic cached data only; patient-facing text only from reviewed templates.",
+  "description": "General Slot-to-Stop development agent that carries the CLI guardrail hooks (#1 feed-freshness warning on spawn, #2 template reminder, #3 template-write guard, #4 live-routing blocker, #5 gtfs-mcp provenance log). Deterministic cached data only; patient-facing text only from reviewed templates.",
   "model": "auto",
   "tools": ["fs_read", "fs_write", "execute_bash"],
   "allowedTools": ["fs_read", "fs_write", "execute_bash"],
@@ -21,6 +21,12 @@
     ]
   },
   "hooks": {
+    "agentSpawn": [
+      {
+        "command": "python scripts/hooks/check_data_fresh.py",
+        "timeout_ms": 10000
+      }
+    ],
     "userPromptSubmit": [
       {
         "command": "python scripts/hooks/remind_templates.py",

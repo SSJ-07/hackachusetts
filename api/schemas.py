@@ -188,3 +188,57 @@ class ProvenanceResponse(BaseModel):
     requirement_id: str
     properties: list[PropertyStatus]
     spec_link: str
+
+
+# --------------------------------------------------------------------------- #
+# GET /rural?town (owner: M1) — rural lens, see docs/contracts.md §3
+# --------------------------------------------------------------------------- #
+RuralVerdict = Literal["transit", "assisted_only", "none", "not_assessed"]
+
+
+class RuralFeature(BaseModel):
+    bg_geoid: str
+    town: str
+    county: str
+    lat: float
+    lon: float
+    carless_adults: int = Field(ge=0)
+    transit_share: float = Field(ge=0.0, le=1.0, description="share of ALL cube cells (every clinic x day x hour) that are reachable")
+    desert: bool
+    verdict: RuralVerdict
+    coverage_tier: str
+
+
+class RuralVerdictCount(BaseModel):
+    n_bg: int = Field(ge=0)
+    carless_adults: int = Field(ge=0)
+
+
+class RuralSummary(BaseModel):
+    n_bg: int = Field(ge=0)
+    carless_adults: int = Field(ge=0)
+    by_verdict: dict[str, RuralVerdictCount]
+
+
+class RuralOption(BaseModel):
+    """One town's row from the hand-collected rural tables, provenance included."""
+
+    town: str
+    county: str | None = None
+    coverage_tier: str | None = None
+    has_any_option: bool
+    dial_a_ride: str | None = None
+    coa_driver: str | None = None
+    pt1: str | None = None
+    source_url: str | None = None
+    verified_by: str | None = None
+    date: str | None = None
+
+
+class RuralResponse(BaseModel):
+    town: str | None = None
+    features: list[RuralFeature]
+    summary: RuralSummary
+    options: list[RuralOption]
+    towns_available: list[str]
+    sources: list[SourceRef]

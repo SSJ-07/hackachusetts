@@ -95,7 +95,23 @@
     "title": "Grupos de bloques",
     "notLoaded": "Datos del mapa no cargados. El mapa está oculto, pero todos los números de arriba vienen de la API.",
     "legendTitle": "Parte que puede llegar",
-    "desert": "Desierto de transporte (sin acceso)"
+    "desert": "Desierto de transporte (sin acceso)",
+    "lensTitle": "Vista del mapa",
+    "lensReach": "Quién vive aquí (zonas de justicia ambiental)",
+    "lensRural": "Vista rural: sin ninguna opción",
+    "town": "Pueblo",
+    "allTowns": "Todos los pueblos",
+    "ruralLoading": "Cargando la vista rural…",
+    "ruralUnavailable": "La vista rural necesita datos reales (bg_towns.parquet + las tablas rurales). Ejecute `make data`.",
+    "ruralSummary": "{{none}} grupos de bloques ({{noneAdults}} adultos sin auto) no tienen ninguna opción de transporte. {{assisted}} solo pueden llegar con transporte a demanda, un conductor del Consejo de Mayores o PT-1. {{transit}} pueden llegar en autobús a al menos una hora de clínica. {{notAssessed}} están fuera de la tabla rural.",
+    "verdict": {
+      "transit": "Se llega en autobús (alguna hora de clínica)",
+      "assisted_only": "Solo transporte a demanda / conductor COA / PT-1",
+      "none": "Sin ninguna opción",
+      "not_assessed": "No está en la tabla rural"
+    },
+    "optionsTitle": "Qué tiene este pueblo en lugar de un autobús",
+    "optionsSource": "Fuente"
   },
   "legend": {
     "title": "Parte de adultos sin carro que puede llegar",
