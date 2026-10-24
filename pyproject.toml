@@ -16,12 +16,18 @@ dependencies = [
     "uvicorn==0.54.0",
     # planner/ (M4): reads visit_rules.yaml
     "pyyaml==6.0.3",
+    # engine/audit + pipeline/ (M1/M2): cube, origins, stops_walk (parquet via pyarrow)
+    "numpy==2.3.5",
+    "pandas==2.3.3",
+    "pyarrow==25.0.1",
+    "pyshp==2.3.1",        # pipeline/build_origins.py reads TIGER shapefiles
 ]
 
 [project.optional-dependencies]
 dev = [
     "httpx2==2.16.0",      # fastapi.testclient backend (starlette 1.10 deprecates httpx)
     "hypothesis==6.170.9", # property-based tests
+    "ortools==9.15.6755",  # CP-SAT oracle for the schedule-optimizer property tests
     "pytest==9.1.1",
 ]
 

@@ -1,2 +1,0 @@
-feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_contact_url
-PVTA,https://www.pvta.com,EN,20260917,20261219,https://www.pvta.com/about___contact_us/how_to_reach_us/customer_service.php
