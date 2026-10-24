@@ -1,6 +1,6 @@
 {
   "name": "journal-on-task-finish",
-  "description": "After a Kiro IDE spec task finishes, append a line to docs/kiro-journal.md so our Kiro-usage write-up assembles itself. Fires in the Kiro IDE (postTaskExecution). Not in Web/Crew — use scripts/log_kiro.py there.",
+  "description": "After a Kiro IDE spec task finishes, append a line to the author's docs/kiro-journal/<member>.md so our Kiro-usage write-up assembles itself. Fires in the Kiro IDE (postTaskExecution). Not in Web/Crew — use scripts/log_kiro.py there.",
   "trigger": "postTaskExecution",
   "matcher": "*",
   "action": "python scripts/log_kiro.py --member \"${KIRO_USER:-team}\" --tool IDE --topic spec --what \"spec task finished: ${KIRO_TASK:-a task}\" --kiro \"Kiro implemented the task from the spec and ran its tests\"",
