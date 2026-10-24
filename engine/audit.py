@@ -52,9 +52,18 @@ def load_cube(path: Path = CUBE_PATH) -> pd.DataFrame:
     return df
 
 
-def load_origins(path: Path = ORIGINS_PATH) -> pd.DataFrame:
+def load_origins(path: Path = ORIGINS_PATH, with_moe: bool = True) -> pd.DataFrame:
     df = pd.read_parquet(path)
     df["bg_geoid"] = df["bg_geoid"].astype(str)
+    if with_moe:
+        # Attach ACS 90% margins (engine/equity.py) when data/raw has them; else the
+        # audit simply returns equity_ci = None.
+        from engine.equity import MOE_COLUMNS, load_bg_moe
+
+        moe = load_bg_moe()
+        if moe is not None:
+            df = df.merge(moe[["bg_geoid", *MOE_COLUMNS]], on="bg_geoid", how="left")
+            df[list(MOE_COLUMNS)] = df[list(MOE_COLUMNS)].fillna(0.0)
     return df
 
 
@@ -107,6 +116,12 @@ def sources() -> list[dict[str, Any]]:
          "url": "https://www.mass.gov/info-details/massgis-data-2020-environmental-justice-populations"},
         {"name": "Slot-to-Stop reachability cube (engine.round_trip)", "vintage": "built from the feed above",
          "url": None},
+        {"name": "ACS 5-yr 90% margins of error (equity_ci)",
+         "vintage": _vintage("acs_bg_moe", "ACS 2024 5-year (90% MOE)"),
+         "url": "https://api.census.gov/data/2024/acs/acs5"},
+        {"name": "Census ACS General Handbook, ch. 8 (MOE formulas for equity_ci)",
+         "vintage": "September 2020",
+         "url": "https://www.census.gov/programs-surveys/acs/library/handbooks/general.html"},
     ]
 
 
@@ -160,13 +175,32 @@ def equity(cube: pd.DataFrame, origins: pd.DataFrame, clinic: str, day: str,
     return out
 
 
+def reach_fraction(cube: pd.DataFrame, origins: pd.DataFrame, clinic: str, day: str,
+                   hours: list[int] | None = None) -> dict[str, float]:
+    """bg_geoid -> fraction of the clinic's hours that day the block group is reachable.
+
+    Same averaging as equity(): reached weight summed over hours / number of hours."""
+    j = _join(cube, origins, clinic, day)
+    if hours is not None:
+        j = j[j.hour.isin(hours)]
+    n_hours = max(j.hour.nunique(), 1)
+    counts = j.loc[j.reachable].groupby("bg_geoid").size()
+    return {str(bg): float(c) / n_hours for bg, c in counts.items()}
+
+
 def audit(cube: pd.DataFrame, origins: pd.DataFrame, clinic: str, community: str, day: str,
           hours: list[int] | None = None) -> dict[str, Any]:
-    """The full GET /audit payload."""
+    """The full GET /audit payload.
+
+    equity_ci (M3, engine/equity.py): 90% intervals from ACS margins of error, or None
+    when the origins carry no MOE columns (MOE data not built)."""
+    from engine.equity import equity_ci  # local: keeps engine.audit importable on its own
+
     orig = filter_community(origins, community)
     return {
         "cells": hour_cells(cube, orig, clinic, day, hours),
         "equity": equity(cube, orig, clinic, day, hours),
+        "equity_ci": equity_ci(reach_fraction(cube, orig, clinic, day, hours), orig),
         "sources": sources(),
     }
 

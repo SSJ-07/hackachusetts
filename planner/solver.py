@@ -16,11 +16,12 @@ Hard rules (steering visit-rules.md):
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date as Date
 from datetime import datetime, timedelta
 
+from planner.driver_windows import DriverWindow, covering
 from planner.guardrails import assert_logistics_only
 from planner.models import (
     Barriers,
@@ -33,6 +34,7 @@ from planner.models import (
     RoundTripResult,
     VisitRule,
 )
+from planner.plan_b import render as render_plan_b
 from planner.pt1 import Pt1Field, prefill
 from planner.transit import RoundTripFn, travel_window
 
@@ -99,6 +101,27 @@ def shift_intervals(work_shift: tuple[int, int] | None) -> list[tuple[int, int]]
     return [(s + d, e + d) for d in (0, _DAY) for s, e in base]
 
 
+def _hhmm(seconds: int) -> str:
+    # GTFS times may pass 24:00; show them as the clock time (00:30), never wrap the data.
+    s = seconds % _DAY
+    return f"{s // _HOUR:02d}:{s % _HOUR // 60:02d}"
+
+
+def _plan_b(trip: RoundTripResult, sections: Mapping[str, str] | None) -> str | None:
+    """VP-23: plan B text from the signed template only; None when there is none.
+
+    later_bus: the chosen return bus is not the last one, so the last bus home is the
+    fallback. last_bus: the chosen return already is the last bus (or it is unknown).
+    """
+    if not sections or not trip.ret_legs:
+        return None
+    ret_dep = trip.ret_legs[0].dep
+    last = trip.last_bus_home
+    if last is not None and last > ret_dep:
+        return render_plan_b(sections, "later_bus", {"later_bus_time": _hhmm(last)})
+    return render_plan_b(sections, "last_bus", {})
+
+
 def overlaps(window: tuple[int, int], intervals: Iterable[tuple[int, int]]) -> bool:
     lo, hi = window
     return any(lo < e and hi > s for s, e in intervals)
@@ -137,7 +160,17 @@ def plan_visit(
     candidate_slots: Sequence[CandidateSlot],
     round_trip: RoundTripFn,
     pt1_fields: tuple[Pt1Field, ...] = (),
+    driver_windows: Sequence[DriverWindow] = (),
+    patient_town: str | None = None,
+    plan_b_sections: Mapping[str, str] | None = None,
 ) -> Plan:
+    """Plan one visit.
+
+    driver_windows / patient_town (VP-24): a ride is marked `volunteer_driver` only when a
+    sourced window for the patient's town covers the whole trip; otherwise it stays a
+    PT-1 broker ride. plan_b_sections (VP-23): the SIGNED plan_b template for the
+    patient's language (planner.plan_b.load_plan_b); None keeps plan_b null.
+    """
     if not rule.is_complete:
         # R0: unknown (null) rules are never guessed. Without a verified escort rule we
         # cannot rule out a transit-only plan, so hand off to a navigator.
@@ -188,6 +221,12 @@ def plan_visit(
                 "pt1_request": True,
                 **access_flags,
             }
+            # VP-24: a volunteer driver / COA van only when a sourced window covers the
+            # whole trip (transit travel window as the proxy, else the visit itself).
+            span = c.window or (c.slot.start, c.slot.start + rule.duration_min * 60)
+            w = covering(driver_windows, patient_town, c.slot.date, span)
+            details["ride_mode"] = "volunteer_driver" if w else "pt1_broker"
+            details["window"] = w.as_details() if w else None
             attend.append((Option(OptionKind.RIDE, REASONS["ride_escort"], details), c))
     else:
         for c in checked:
@@ -255,7 +294,7 @@ def plan_visit(
             out_legs=tuple(top_slot.trip.out_legs),
             ret_legs=tuple(top_slot.trip.ret_legs),
             last_bus_home=top_slot.trip.last_bus_home,
-            plan_b=None,  # patient-facing text: waits on reviewed templates (M3)
+            plan_b=_plan_b(top_slot.trip, plan_b_sections),
         )
         if top_slot
         else Itinerary()
@@ -270,4 +309,5 @@ def plan_visit(
 
     plan = Plan(options=tuple(options), itinerary=itinerary, pt1_prefill=pt1)
     assert_logistics_only([[o.why, o.details] for o in plan.options])  # R5
+    assert_logistics_only(plan.itinerary.plan_b or "")  # R5 also covers plan B text
     return plan

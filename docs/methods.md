@@ -74,3 +74,33 @@ entirely unserved by fixed-route transit, which is the evidence behind the produ
 rural "no option at all" layer.
 
 The straight-line × 1.3 detour is an MVP substitute for a true OSM walk network.
+
+## equity_ci — 90% confidence intervals (engine/equity.py, M3)
+
+The equity shares in `/audit` rest on ACS 5-year estimates, which have sampling error.
+`equity_ci` carries the published 90% margins of error (`data/raw/acs_bg_moe.csv`, the
+`_M` twins of every `_E` variable above, fetched by `scripts/get_data.py`) through to a
+90% interval on each group's reachable share.
+
+Source: U.S. Census Bureau, *Understanding and Using American Community Survey Data:
+What All Data Users Need to Know* (September 2020), ch. 8, "Calculating Measures of Error
+for Derived Estimates" — https://www.census.gov/programs-surveys/acs/library/handbooks/general.html
+
+```
+sum / difference   MOE_A = sqrt(Σ MOE_i²)
+proportion p=X/Y   MOE_p = sqrt(MOE_X² − p²·MOE_Y²) / Y      (ratio form with + if < 0)
+product C=A·B      MOE_C = sqrt(A²·MOE_B² + B²·MOE_A²)
+interval           [x − MOE, x + MOE], clipped to [0, 1]
+```
+
+Per block group: adults (difference), zero-vehicle share (proportion), car-less adults
+(product), lep_pct and age65_pct (proportions). Group weights: zero_veh = C, ej = C × flag
+(the flag is exact), lep = C × lep_pct, age65 = C × age65_pct (products). Group share
+= Σ f·w / Σ w, where f (fraction of the clinic's hours a block group is reachable) is
+exact from the cube; the proportion formula then gives the share's MOE.
+
+Limits: errors are treated as independent across block groups and tables, as in the
+handbook, so intervals are approximate. A share's MOE is capped at 1.0. ACS annotation
+codes (negative MOE values) are treated as 0; none occur in the 2024 pull (506 block
+groups). `share` and `n` in `equity_ci` equal `equity` exactly; `lo <= share <= hi`
+always (property test `tests/property/test_equity_ci.py`).

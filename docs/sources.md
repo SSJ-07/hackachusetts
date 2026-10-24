@@ -40,6 +40,13 @@ Status values: `verified` · `needs-manual-verification` · `unsourced`
   `planner/visit_rules.yaml` (colonoscopy escort_required=true). It is a logistics rule,
   not a clinical claim. A specific clinic MAY state a stricter policy, but the general
   escort-home standard is now sourced.
+- **Clinic-level (Baystate, demo clinic BAY_GI_SPRINGFIELD):** Baystate Health's own
+  colonoscopy page: "We'll sedate you (give you light anesthesia) before your colonoscopy
+  ... You'll need a responsible adult with you to drive you home after your colonoscopy."
+  URL: https://www.baystatehealth.org/medical-services/colonoscopy (read 2026-10-24).
+  Status: **verified** (system-wide Baystate policy page; not a per-unit protocol).
+  The other demo clinic, CHCFC Greenfield, is a primary-care anchor with no sedated
+  procedure, so no escort policy applies to it.
 
 ## 3. Baystate CHNA transport mention
 - **Claim (line 80):** "Access to care and transportation show up again and again in
@@ -51,9 +58,11 @@ Status values: `verified` · `needs-manual-verification` · `unsourced`
   healthcare access." 2025 Baystate Franklin Medical Center CHNA published via FRCOG.
 - **URL:** https://frcog.org/wp-content/uploads/2025/12/2025-Baystate-Franklin-Medical-Center-Community-Health-Needs-Assessment.pdf (2025 BFMC CHNA); https://www.publichealthwm.org/report/baystate-health-community-health-needs-assessment-2025 (2025 Baystate Health CHNA)
 - **Vintage:** 2019 quote (verbatim); 2022 + 2025 CHNA cycles
-- **Status:** verified
+- **Status:** verified (quote) · **page number: needs-manual-verification**
 - **Note:** Transportation is explicitly named as a major access barrier in Baystate's
-  own CHNA materials. For a page-level cite in the demo, use the 2025 BFMC CHNA PDF.
+  own CHNA materials. The page-level cite is still open: the 2025 BFMC CHNA PDF blocks
+  automated download (HTTP 403), so a person must open it, search "transportation", and
+  record the page number here (manual-data task 7.3).
 
 ## 4. MassHealth ACO flexible-services scope
 - **Claim (line 81):** "MassHealth ACOs ... run health-related social needs programs

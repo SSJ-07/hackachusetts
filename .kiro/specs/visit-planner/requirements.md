@@ -87,3 +87,5 @@ Each requirement has a stable id (`VP-n`) referenced by `/provenance` and tests.
 | VP-16 | `test_planner_properties.py::test_p18_no_clinical_or_eligibility_text`, `test_planner_solver.py::test_guardrail_catches_banned_wording` |
 | VP-18 | `test_api_contracts.py::test_real_mode_reports_unavailable` |
 | VP-19 | `test_planner_solver.py::test_planner_does_not_import_web_frameworks` |
+| VP-23 | `test_planner_vp23_vp24.py::test_vp23_*`, `test_driver_windows_plan_b.py` |
+| VP-24 | `test_planner_vp23_vp24.py::test_vp24_*`, `test_driver_windows_plan_b.py` |

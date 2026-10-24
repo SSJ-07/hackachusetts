@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api import __version__
 from api.deps import data_mode
-from api.routers import audit, clinics, plan, provenance, rural, suggest, whatif
+from api.routers import audit, clinics, plan, provenance, report, rural, suggest, whatif
 from api.schemas import HealthResponse
 
 
@@ -51,6 +51,7 @@ def create_app() -> FastAPI:
     app.include_router(rural.router)  # M1 (rural lens)
     app.include_router(plan.router)  # M4
     app.include_router(provenance.router)  # M4
+    app.include_router(report.router)  # M3 (CHNA PDF report)
 
     return app
 
