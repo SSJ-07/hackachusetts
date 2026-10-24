@@ -1,0 +1,8 @@
+agency_id,route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,min_headway_minutes,eligibility_restricted,continuous_pickup,continuous_drop_off,tts_route_short_name,tts_route_long_name
+961,20,20,GreenLink,,3,,70AD47,020202,0,,0,1,1,,
+961,21,21,Greenfield,,3,,375623,FFFFFF,1,120,0,1,1,,
+961,23,23,Sunderland,,3,,F51414,FFFFFF,3,120,0,1,1,,
+961,24,24,Crosstown Connector,Route 24 - Crosstown,3,,2F5496,FFFFFF,4,60,0,1,1,,
+961,31,31,Northampton,,3,,7301dd,FFFFFF,5,120,0,1,1,,
+961,32,32,Orange,,3,,ED9119,020202,6,120,0,1,1,,
+961,41,41,Charlemont,,3,,753C0B,FFFFFF,7,,0,1,1,,

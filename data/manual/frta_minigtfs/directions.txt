@@ -1,0 +1,13 @@
+route_id,direction_id,direction
+24,1,Inbound
+24,0,Outbound
+23,1,Inbound
+23,0,Outbound
+21,0,Loop
+20,0,Loop
+41,1,Inbound
+41,0,Outbound
+32,1,Inbound
+32,0,Outbound
+31,1,Inbound
+31,0,Outbound

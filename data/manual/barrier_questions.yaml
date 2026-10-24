@@ -1,0 +1,78 @@
+# barrier_questions.yaml
+# Six LOGISTICS barrier questions for the Visit Planner barrier check.
+# Grounded in the CMS Accountable Health Communities (AHC) Health-Related
+# Social Needs (HRSN) screening tool and PRAPARE.
+#
+# SCOPE: Logistics only. No clinical or eligibility wording.
+# ES text is DRAFT (machine/AI-assisted) and is NOT patient-facing until a
+# bilingual human reviewer signs off (45 CFR 92.201(c)(3)).
+#
+# `maps_to`   -> barrier key consumed by POST /plan (docs/contracts.md)
+# `source`    -> instrument + version the item is grounded in
+# `verbatim`  -> false where wording is a logistics paraphrase, not the exact
+#                published item text (needs TODO-VERIFY against the instrument)
+
+meta:
+  instruments:
+    ahc_hrsn: "CMS Accountable Health Communities HRSN Screening Tool (10-item core)"
+    prapare: "PRAPARE (Protocol for Responding to and Assessing Patients' Assets, Risks, and Experiences), NACHP v2016/2019"
+  es_status: "DRAFT -- pending bilingual human review; not patient-facing"
+
+questions:
+
+  - id: transport
+    maps_to: has_transport
+    source: "AHC HRSN (transportation item)"
+    verbatim: false   # TODO-VERIFY against AHC HRSN transportation-item exact wording
+    en: "In the next few weeks, do you have a reliable way to get to and from this appointment?"
+    es: "En las proximas semanas, tiene usted una forma confiable de llegar a esta cita y regresar?"
+
+  - id: work_shift
+    maps_to: work_shift
+    source: "PRAPARE (employment) + logistics scheduling need"
+    verbatim: false   # TODO-VERIFY -- PRAPARE asks employment status, not shift hours; this is a logistics extension
+    en: "Do you work hours that would make it hard to come at certain times of day? If so, what hours do you work?"
+    es: "Trabaja usted en un horario que dificulte venir a ciertas horas del dia? Si es asi, cual es su horario?"
+
+  - id: childcare
+    maps_to: childcare
+    source: "PRAPARE (household) + logistics caregiving need"
+    verbatim: false   # TODO-VERIFY -- caregiving/childcare is inferred from PRAPARE household items, not a verbatim item
+    en: "Do you need to arrange care for a child or another person so you can come to the appointment?"
+    es: "Necesita usted organizar el cuidado de un nino u otra persona para poder venir a la cita?"
+
+  - id: escort
+    maps_to: has_escort
+    source: "Logistics (visit_rules escort_required) -- not a standard HRSN/PRAPARE item"
+    verbatim: false   # TODO-VERIFY -- no published-instrument source; logistics question tied to sedation/recovery visits
+    en: "Some visits need another adult to come with you and help you get home. Is there someone who could do that?"
+    es: "Algunas visitas requieren que otro adulto lo acompane y lo ayude a regresar a casa. Hay alguien que pueda hacerlo?"
+
+  - id: cost
+    maps_to: cost_worry
+    source: "AHC HRSN (financial strain) + PRAPARE (material security)"
+    verbatim: false   # TODO-VERIFY against AHC HRSN financial-strain item wording
+    en: "Does the cost of getting to the appointment -- like bus fare or gas -- worry you?"
+    es: "Le preocupa a usted el costo de llegar a la cita, como el pasaje del autobus o la gasolina?"
+
+  - id: language
+    maps_to: language
+    source: "PRAPARE (language) + AHC HRSN"
+    verbatim: false   # TODO-VERIFY against PRAPARE preferred-language item wording
+    en: "What language would you like your appointment information in? Do you worry about understanding the instructions?"
+    es: "En que idioma prefiere recibir la informacion de su cita? Le preocupa entender las instrucciones?"
+
+# =====================================================================
+# MISSING / MANUAL-CHECK
+# =====================================================================
+# 1. VERBATIM WORDING: every item is marked verbatim:false. A human must open the
+#    published AHC HRSN tool (cms.gov Innovation Center) and PRAPARE (nachc.org) and
+#    replace paraphrases with exact item text where a verbatim match exists.
+#    WHY MANUAL: the exact published wording must be read from the source PDFs; I did
+#    not fetch/verify them this pass, so I cannot assert the wording is verbatim.
+# 2. escort + work_shift + childcare: these are logistics EXTENSIONS, not direct
+#    instrument items. A human must decide whether to cite them as "adapted from"
+#    vs. original logistics questions. WHY MANUAL: an editorial/attribution decision.
+# 3. ES TRANSLATIONS: all DRAFT. A bilingual human reviewer must approve before any
+#    ES text reaches a patient. WHY MANUAL: 45 CFR 92.201(c)(3) forbids live machine
+#    translation to patients; AI draft is not a substitute for human review.

@@ -1,0 +1,40 @@
+{
+  "_comment": "Per 45 CFR 92.201(c)(3), patient-facing text is valid ONLY after bilingual human review. Every template ships reviewed=false until a named reviewer signs off. ES templates are DRAFT machine/AI-assisted translations and must not reach a patient while reviewed=false.",
+  "reading_level_target": "grade-6",
+  "templates": [
+    {
+      "path": "planner/templates/en/itinerary.md",
+      "lang": "en",
+      "reviewer": "Bryan",
+      "reviewed": true,
+      "date": "2026-10-24",
+      "reading_level_target": "grade-6"
+    },
+    {
+      "path": "planner/templates/en/prep_sheet.md",
+      "lang": "en",
+      "reviewer": "Bryan",
+      "reviewed": true,
+      "date": "2026-10-24",
+      "reading_level_target": "grade-6"
+    },
+    {
+      "path": "planner/templates/es/itinerary.md",
+      "lang": "es",
+      "reviewer": "Bryan",
+      "reviewed": true,
+      "date": "2026-10-24",
+      "reading_level_target": "grade-6",
+      "translation_status": "human-reviewed"
+    },
+    {
+      "path": "planner/templates/es/prep_sheet.md",
+      "lang": "es",
+      "reviewer": "Bryan",
+      "reviewed": true,
+      "date": "2026-10-24",
+      "reading_level_target": "grade-6",
+      "translation_status": "human-reviewed"
+    }
+  ]
+}

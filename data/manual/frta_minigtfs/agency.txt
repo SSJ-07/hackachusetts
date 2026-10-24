@@ -1,0 +1,2 @@
+agency_id,agency_url,agency_lang,agency_name,agency_phone,agency_timezone,agency_fare_url,tts_agency_name
+961,http://frta.org,en,Franklin Regional Transit Authority,,America/New_York,http://frta.org/getting-around/fares-passes-transfers/,
