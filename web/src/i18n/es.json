@@ -1,0 +1,95 @@
+{
+  "app": {
+    "brand": "Slot-to-Stop",
+    "skipToContent": "Saltar al contenido principal",
+    "language": "Idioma",
+    "nav": {
+      "audit": "Auditoría de clínica",
+      "planner": "Planificador de visitas",
+      "about": "Acerca de"
+    }
+  },
+  "audit": {
+    "title": "Auditoría de acceso a la clínica",
+    "intro": "Vea cuántos adultos sin carro pueden llegar a esta clínica en autobús, hora por hora.",
+    "clinic": "Clínica",
+    "community": "Comunidad",
+    "day": "Día",
+    "loading": "Cargando auditoría…",
+    "empty": "Aún no hay datos de acceso para esta clínica, comunidad y día.",
+    "error": "No se pudo cargar la auditoría.",
+    "retry": "Intentar de nuevo",
+    "gridCaption": "Parte de adultos sin carro que pueden llegar a la clínica, por día y hora.",
+    "hour": "Hora",
+    "cellName": "{{day}} {{hour}}, el {{pct}}% de {{n}} adultos sin carro puede llegar a la clínica",
+    "cellNoData": "{{day}} {{hour}}, sin datos",
+    "pickUpHint": "Presione Entrar para tomar este bloque, luego use las flechas y Entrar para moverlo.",
+    "ribbon": {
+      "title": "Vista del día: {{day}}",
+      "empty": "Elija una celda para ver las horas de ese día."
+    },
+    "whatif": {
+      "moving": "Moviendo el bloque…",
+      "movedTitle": "Bloque movido",
+      "before": "Antes",
+      "after": "Después",
+      "change": "Cambio",
+      "picked": "Tomó {{day}} {{hour}}. Use las flechas para elegir una nueva hora, Entrar para soltar, Esc para cancelar.",
+      "dropped": "Movió el bloque de {{day}} a las {{hour}}. Cuadrícula actualizada.",
+      "cancelled": "Movimiento cancelado."
+    },
+    "days": {
+      "mon": "Lunes",
+      "tue": "Martes",
+      "wed": "Miércoles",
+      "thu": "Jueves",
+      "fri": "Viernes",
+      "sat": "Sábado",
+      "sun": "Domingo"
+    },
+    "dayShort": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb",
+      "sun": "Dom"
+    }
+  },
+  "equity": {
+    "title": "A quién se llega",
+    "share": "Puede llegar",
+    "ofN": "de {{n}}",
+    "groups": {
+      "ej": "Zonas de justicia ambiental",
+      "lep": "Inglés limitado",
+      "age65": "65 años o más",
+      "zero_veh": "Sin carro en el hogar"
+    }
+  },
+  "map": {
+    "title": "Grupos de bloques",
+    "notLoaded": "Datos del mapa no cargados. El mapa está oculto, pero todos los números de arriba vienen de la API.",
+    "legendTitle": "Parte que puede llegar",
+    "desert": "Desierto de transporte (sin acceso)"
+  },
+  "legend": {
+    "title": "Parte de adultos sin carro que puede llegar",
+    "none": "Sin datos"
+  },
+  "sources": {
+    "title": "Fuentes",
+    "intro": "Cada número de arriba viene de estas fuentes.",
+    "vintage": "Año"
+  },
+  "planner": {
+    "title": "Planificador de visitas",
+    "placeholder": "Planificador de visitas — a cargo de M4"
+  },
+  "about": {
+    "title": "Acerca de Slot-to-Stop",
+    "body": "Slot-to-Stop muestra cómo las horas de cita de la clínica coinciden con el servicio de autobús, para que las clínicas elijan horas a las que más pacientes sin carro puedan llegar. Solo logística. Su equipo de atención decide su atención.",
+    "guardrail": "Cada número lleva su fuente y año. Los pacientes mostrados son sintéticos."
+  }
+}

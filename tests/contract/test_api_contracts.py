@@ -105,9 +105,14 @@ def test_provenance_requires_id(client):
 def test_real_mode_reports_unavailable(monkeypatch, maria_request):
     from fastapi.testclient import TestClient
 
+    from api import deps
     from api.main import create_app
+    from engine import audit as engine_audit
 
     monkeypatch.setenv("SLOT_TO_STOP_DATA", "real")
+    # Simulate "cube not built yet" regardless of what is cached on this machine.
+    monkeypatch.setattr(engine_audit, "CUBE_PATH", engine_audit.ROOT / "does-not-exist.parquet")
+    deps._load_cube_origins.cache_clear()
     real = TestClient(create_app())
     assert real.get("/health").json()["data_mode"] == "real"
     assert real.get("/audit", params={"clinic": "c", "community": "h", "day": "mon"}).status_code == 503

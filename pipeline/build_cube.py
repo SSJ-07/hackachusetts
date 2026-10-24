@@ -5,13 +5,14 @@ that block group make the round trip to that clinic for an appointment starting 
 `hour` on `day`, given the visit length? Reachability comes ONLY from the engine's
 authoritative round_trip (steering: never re-derive it).
 
-Efficiency: per (clinic, day, hour) we do TWO one-to-many profile searches over the
-PVTA feed instead of one round_trip per block group —
-  - engine.latest_departure  from the clinic stops, deadline = start - check-in buffer
-      -> latest an origin may leave home and still check in  (the OUTBOUND half)
-  - engine.earliest_arrival  from the clinic stops, depart >= visit end
-      -> earliest an origin gets home                        (the RETURN half)
-A block group is reachable iff it has a boarding stop covered by BOTH.
+Method: one engine.round_trip per (clinic, day, hour, block group), with the block
+group resolved by its population-weighted centroid (lat, lon). This is the same call
+the differential tests validate, so the cube cannot drift from the router.
+
+A faster two-profile-search version (latest_departure + earliest_arrival) was tried
+and DISCARDED: comparing stop membership ignored walk time and timing, and it
+under-reported reachability (1.2% flat vs the true ~31%). Re-introduce batching only
+with a test proving it equals round_trip cell for cell. Current cost: ~9 min/clinic.
 
 Clinics resolve to PVTA stops via data/manual/clinic_stops.csv (clinic_id -> stop_id),
 because the manual clinic files carry addresses, not coordinates. Missing clinics are
