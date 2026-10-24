@@ -7,6 +7,8 @@
 - [x] 5. Regression tests: `tests/property/test_transfer_limit.py` (pinned `@example(n=4)`) and
       `tests/golden/test_pvta_golden.py` (real-feed origins).
 - [x] 6. Confirm no regression: differential (RAPTOR == CSA == brute force), midnight and golden suites green.
+- [x] 6b. Same bug found in backward `latest_departure` (reversed chain, n=4 -> 4 buses); fixed the same way;
+      `test_latest_departure_respects_transfer_limit` with `@example(n=4, reverse=True)`.
 - [ ] 7. Add the chain feed to `engine/synth.py` so random differential runs also stress the limit (follow-up).
 
 Requirement: RT-9. Status: **fixed**.

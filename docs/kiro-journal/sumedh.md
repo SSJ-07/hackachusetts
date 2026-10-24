@@ -55,3 +55,8 @@ outcome: pytest green, web build passes, CI green; squash-merged so a 6.5 MB dat
 what: retroactive Bugfix spec bug-transfer-limit from the real PVTA counterexample (4107->1053: 4 out / 6 return buses, limit 3)
 kiro: re-ran the pre-fix RAPTOR: a chain-feed Hypothesis property failed and shrank to n=4; pinned it as @example in tests/property/test_transfer_limit.py
 outcome: property fails on pre-fix code, passes on fix; spec in .kiro/specs/bug-transfer-limit/
+
+## 2026-10-24 18:02 · sumedh · Crew · topic: hooks
+what: Phase B M1: UI properties + Playwright/axe, Suggest panel on GET /suggest, 8 new hooks, 3-job CI, power fresh-workspace test, experiments 3/4, Scorecard, Crew feed crons, Kiro Web issues #8-10
+kiro: Crew ran 5 parallel worker agents on disjoint files; parent verified every file and re-ran all suites; axe hook found 2 serious a11y bugs, power test found the round_trip tool-name bug
+outcome: 396 pytest + 20 vitest + 2 e2e + 2 axe green; uncommitted on sumedh

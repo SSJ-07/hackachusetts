@@ -38,6 +38,13 @@ it to the minimal case:
 n=4: reached S4 with 4 buses > 3
 ```
 
+### Counterexample 3: the same bug in the backward search
+`latest_departure` (backward RAPTOR, the reverse profile for the cube) had the same
+same-round read/write. On a chain of 4 single-hop routes inserted **last hop first**,
+it reached `S0` with **4 buses** (limit 3); with 5 or 6 hops it chained 5 or 6. The forward
+chain didn't show it, because the trip scan order happened to be safe. Found while
+writing this spec; fixed with the same frozen-snapshot change.
+
 ## Current behaviour (before fix)
 1.1 WHEN a journey needs more than `max_transfers + 1` buses THEN RAPTOR still reached the
     destination and reported it reachable.

@@ -28,9 +28,132 @@ jobs:
         # The real gate. Must NOT swallow failures — a red test blocks the PR.
         run: pytest -q
 
-      - name: Kiro release-checker gate (headless CLI)
-        # Placeholder: wire the headless Kiro CLI once the exact flags are
-        # confirmed with `kiro-cli --help`. Intended command (does not fail the
-        # build yet):
-        #   kiro-cli agent run release-checker --headless --fail-on-error
-        run: 'echo "TODO - kiro-cli release-checker gate; confirm flags with kiro-cli --help"'
+      # Validates the workflow YAML and (if the Kiro CLI is present) the agent
+      # configs. Uses only the stdlib — no pyyaml install into .venv — so it runs
+      # on a clean GitHub runner. Does not change the behaviour of the test steps
+      # above.
+      - name: Validate CI workflow YAML
+        run: |
+          python3 -c 'import yaml,sys; yaml.safe_load(open(".github/workflows/kiro-ci.yml")); print("kiro-ci.yml: YAML OK")' \
+            || ruby -ryaml -e 'YAML.load_file(".github/workflows/kiro-ci.yml"); puts "kiro-ci.yml: YAML OK (ruby)"'
+
+      - name: kiro-cli agent validate (only if kiro-cli is installed)
+        run: |
+          if command -v kiro-cli >/dev/null 2>&1; then
+            for f in .kiro/agents/*.json; do
+              echo "validating $f"
+              kiro-cli agent validate --path "$f"
+            done
+          else
+            echo "::notice::kiro-cli not installed on this runner — skipping agent validate"
+          fi
+
+  web:
+    name: web (typecheck + unit + e2e + a11y)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck (tsc -b)
+        run: npx tsc -b
+
+      - name: Unit tests (vitest)
+        run: npx vitest run
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (playwright audit)
+        run: npm run e2e
+
+      - name: Accessibility (playwright a11y / axe)
+        run: npm run a11y
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report/
+          retention-days: 7
+
+  release-gate:
+    name: Kiro release-checker gate (headless)
+    runs-on: ubuntu-latest
+    needs: [test, web]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" ortools
+          if [ -f mcp/requirements.txt ]; then pip install -r mcp/requirements.txt; fi
+
+      # Forks and PRs that lack the KIRO_API_KEY secret cannot authenticate the
+      # Kiro CLI, so skip the gate with a notice instead of failing the job.
+      # The test + web jobs above are still the hard gate for those builds.
+      - name: Run release-checker (only with credentials)
+        env:
+          # NOTE: kiro-cli 2.34.0 authenticates interactively (Builder ID /
+          # Identity Center OAuth device flow); it exposes NO documented
+          # API-key/token env var or flag. KIRO_API_KEY is the agreed secret
+          # NAME for CI credentials — wire it to whatever non-interactive auth
+          # the CLI gains (or a `kiro-cli login` token step). Until then this
+          # step only runs when the secret is present, and otherwise skips.
+          KIRO_API_KEY: ${{ secrets.KIRO_API_KEY }}
+        run: |
+          if [ -z "${KIRO_API_KEY}" ]; then
+            echo "::notice::KIRO_API_KEY not set (fork/PR without secret) — skipping Kiro release-checker gate. Engine + web jobs remain the hard gate."
+            exit 0
+          fi
+
+          # --- Install the Kiro CLI -------------------------------------------
+          # TODO(install): no public non-interactive install one-liner was
+          # confirmed from `kiro-cli --help` (the `setup`/`update` subcommands
+          # assume an existing install). Replace the line below with the
+          # documented installer for your platform once confirmed, e.g. the
+          # official install script for linux x86_64.
+          #   curl -fsSL https://.../install.sh | bash   # TODO: confirm URL
+          if ! command -v kiro-cli >/dev/null 2>&1; then
+            echo "::error::kiro-cli not installed and no install command wired (see TODO in this step)."
+            exit 1
+          fi
+
+          # --- Run the gate ----------------------------------------------------
+          # Flags verified against kiro-cli 2.34.0:
+          #   --agent <AGENT>            `kiro-cli chat --help`
+          #   --trust-tools=<names>     `kiro-cli chat --help`
+          #   --no-interactive          `kiro-cli chat --help`
+          #   [INPUT] positional prompt `kiro-cli chat --help`
+          # release-checker.json tools (read-only): fs_read, execute_bash.
+          set -o pipefail
+          kiro-cli chat \
+            --no-interactive \
+            --agent release-checker \
+            --trust-tools=fs_read,execute_bash \
+            "You are the CI release gate. Run the test suites (pytest: unit, property, differential, golden; and the API contract tests) and verify RAPTOR == CSA == brute force still holds and no router property regressed. Name any failing tests. End your reply with a single final line that is exactly 'RELEASE: PASS' if every gate passed, or 'RELEASE: FAIL' otherwise." \
+            2>&1 | tee release-checker.out
+
+          if grep -q 'RELEASE: PASS' release-checker.out; then
+            echo "Kiro release-checker: PASS"
+          else
+            echo "::error::Kiro release-checker did not emit 'RELEASE: PASS'"
+            exit 1
+          fi

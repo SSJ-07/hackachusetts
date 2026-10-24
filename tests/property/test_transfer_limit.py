@@ -13,7 +13,7 @@ from __future__ import annotations
 from hypothesis import example, given, settings
 from hypothesis import strategies as st
 
-from engine import earliest_arrival, round_trip
+from engine import earliest_arrival, latest_departure, round_trip
 from engine.brute_force import earliest_arrival as bf_earliest_arrival
 from engine.csa import earliest_arrival as csa_earliest_arrival
 from engine.gtfs import Stop, StopTime, Timetable, Trip
@@ -64,6 +64,32 @@ def test_transfer_limit_agrees_with_oracles(n: int) -> None:
     csa = set(csa_earliest_arrival(tt, {"S0": 0}, DATE))
     bf = set(bf_earliest_arrival(tt, {"S0": 0}, DATE))
     assert rap == csa == bf
+
+
+def reversed_chain_feed(n: int) -> Timetable:
+    """Same chain, trips inserted last-hop-first. The pre-fix backward search
+    scanned trips in this order and chained every hop inside one round."""
+    stops = {f"S{i}": Stop(f"S{i}", 42.0 + i * 0.02, -72.6) for i in range(n + 1)}
+    trips: dict[str, Trip] = {}
+    sts: list[StopTime] = []
+    for i in reversed(range(n)):
+        tid = f"T{i}"
+        trips[tid] = Trip(tid, f"R{i}", "WKDY")
+        dep = 7 * 3600 + i * 900
+        sts += [StopTime(tid, 0, f"S{i}", dep, dep), StopTime(tid, 1, f"S{i + 1}", dep + 600, dep + 600)]
+    return Timetable(stops=stops, trips=trips, stop_times=sts, service_date=DATE).index()
+
+
+@settings(max_examples=200, deadline=None)
+@given(n=st.integers(min_value=1, max_value=12), reverse=st.booleans())
+@example(n=4, reverse=True)  # shrunk counterexample for the backward search
+def test_latest_departure_respects_transfer_limit(n: int, reverse: bool) -> None:
+    tt = reversed_chain_feed(n) if reverse else chain_feed(n)
+    ld = latest_departure(tt, {f"S{n}": 20 * 3600}, DATE)
+    for stop, (_dep, legs) in ld.items():
+        assert _bus_legs(legs) <= MAX_BUSES, f"n={n} reverse={reverse}: {stop} {_bus_legs(legs)} buses"
+    if n > MAX_BUSES:
+        assert "S0" not in ld
 
 
 def test_round_trip_respects_limit_on_chain() -> None:

@@ -57,6 +57,29 @@
       "sun": "Dom"
     }
   },
+  "suggest": {
+    "title": "Sugerir un mejor horario",
+    "intro": "Elija los bloques que abre ahora y proponemos hasta tres cambios para que más adultos sin carro puedan llegar a esta clínica.",
+    "blocksLegend": "Sus bloques actuales",
+    "blocksHint": "Elija las horas que esta clínica abre actualmente el {{day}}.",
+    "run": "Sugerir cambios",
+    "loading": "Buscando mejores horarios…",
+    "empty": "No se encontraron mejores cambios para estos bloques.",
+    "error": "No se pudieron obtener sugerencias.",
+    "needsData": "Las sugerencias de horario necesitan datos reales. Esta demostración usa datos sintéticos, por lo que las sugerencias están desactivadas aquí.",
+    "retry": "Intentar de nuevo",
+    "illustrative": "Ilustrativo — aún no respaldado por datos reales.",
+    "change": "Mover {{block}} a {{hour}}",
+    "gainPeople": "+{{count}} adultos sin carro más alcanzados",
+    "gainVisitHours": "+{{hours}} horas de visita de acceso",
+    "sourcesLabel": "Fuentes de esta sugerencia",
+    "preview": "Previsualizar este cambio",
+    "previewing": "Previsualizando…",
+    "previewTitle": "Vista previa: {{block}} → {{hour}}",
+    "before": "Antes",
+    "after": "Después",
+    "delta": "Cambio"
+  },
   "equity": {
     "title": "A quién se llega",
     "share": "Puede llegar",

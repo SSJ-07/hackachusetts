@@ -124,7 +124,7 @@ export function BlockGroupMap() {
       <div
         className="map-wrap"
         ref={ref}
-        role="img"
+        role="group"
         aria-label={t("map.title")}
       />
       <ol className="legend" aria-label={t("map.legendTitle")}>
