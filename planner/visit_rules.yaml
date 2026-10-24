@@ -1,0 +1,60 @@
+# planner/visit_rules.yaml — visit-type rulebook (logistics only)
+#
+# STATUS: PLACEHOLDER. Owner: M3 fills in values + sources; M4 reads it from the solver.
+# Referenced by steering .kiro/steering/visit-rules.md via #[[file:planner/visit_rules.yaml]].
+#
+# Rules:
+# - Logistics only. These fields drive scheduling and transport, never clinical or
+#   eligibility decisions. "Your care team decides your care."
+# - Every number carries a source and vintage. Until M3 verifies a value it stays `null`
+#   and `source.status` stays `todo`. Code must treat `null` as "unknown", never as 0/false.
+# - Field meanings are defined in .kiro/steering/visit-rules.md.
+#
+# Schema (per visit type):
+#   label:            {en: str, es: str}   display name (ES from reviewed templates only)
+#   duration:         int | null           total minutes incl. prep + recovery -> round_trip(minutes=...)
+#   escort_required:  bool | null          true => a transit-only plan is never valid
+#   telehealth_ok:    bool | null          telehealth swap offered only when true
+#   prep:             bool | null          attach an in-language prep sheet (planner/templates/)
+#   recurrence:       {per_week: int} | null
+#   source:           {name: str | null, url: str | null, vintage: str | null, status: todo | verified}
+
+schema_version: 1
+status: placeholder
+
+visit_types:
+  colonoscopy:
+    label: { en: "Colonoscopy (after a positive FIT)", es: null }
+    duration: null
+    escort_required: null   # steering: sedation => escort; M3 to confirm with source
+    telehealth_ok: null     # steering: procedures are false; M3 to confirm
+    prep: null
+    recurrence: null
+    source: { name: null, url: null, vintage: null, status: todo }
+
+  prenatal:
+    label: { en: "Prenatal visit", es: null }
+    duration: null
+    escort_required: null
+    telehealth_ok: null
+    prep: null
+    recurrence: null
+    source: { name: null, url: null, vintage: null, status: todo }
+
+  dialysis:
+    label: { en: "Dialysis", es: null }
+    duration: null
+    escort_required: null
+    telehealth_ok: null     # steering: procedures are false; M3 to confirm
+    prep: null
+    recurrence: null        # steering: 3x/week; M3 to confirm with source
+    source: { name: null, url: null, vintage: null, status: todo }
+
+  chemo:
+    label: { en: "Chemotherapy / infusion", es: null }
+    duration: null
+    escort_required: null
+    telehealth_ok: null     # steering: infusion is false; M3 to confirm
+    prep: null
+    recurrence: null
+    source: { name: null, url: null, vintage: null, status: todo }
