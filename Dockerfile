@@ -39,4 +39,5 @@ ENV CARELEAP_DATA=real \
     PORT=8000
 
 EXPOSE 8000
-CMD ["sh", "-c", "python -m uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# The port comes from $PORT inside api/__main__.py: no shell expansion needed.
+CMD ["python", "-m", "api"]
