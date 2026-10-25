@@ -190,7 +190,25 @@
       "recommended": "Mejor opción",
       "recurrence": "Esta visita se repite unas {{count}} veces por semana. Planee el mismo viaje cada vez.",
       "showMore": "Mostrar {{n}} opciones más",
-      "showLess": "Mostrar menos opciones"
+      "showLess": "Mostrar menos opciones",
+      "detail": {
+        "when": "Cuándo",
+        "rideMode": "Viaje",
+        "rideModes": {
+          "volunteer_driver": "Conductor voluntario / van del Consejo de Mayores (horario con fuente)",
+          "pt1_broker": "Viaje por el gestor PT-1 de MassHealth"
+        },
+        "bus": "Autobús",
+        "busEstimate": "Estimación en autobús detrás del viaje",
+        "leave": "salir de casa {{time}}",
+        "atClinic": "en la clínica {{time}}",
+        "back": "Regreso",
+        "lastBus": "último autobús a casa {{time}}",
+        "total": "Total",
+        "totalValue": "{{buses}} autobuses, {{min}} min puerta a puerta",
+        "alsoOn": "El mismo viaje también el",
+        "andMore": "+ {{n}} días más"
+      }
     },
     "itinerary": {
       "title": "Su viaje",
@@ -212,7 +230,22 @@
       "title": "Formulario de viaje (PT-1) — borrador",
       "note": "Este es un borrador para ayudar a llenar el formulario. Aún no se ha enviado.",
       "toComplete": "para que una persona lo complete",
-      "empty": "Este plan no necesita formulario de viaje."
+      "empty": "Este plan no necesita formulario de viaje.",
+      "fields": {
+        "member_name": "Nombre del miembro",
+        "member_id": "Número de miembro de MassHealth",
+        "member_dob": "Fecha de nacimiento",
+        "eligible_for_transportation": "Beneficio de transporte registrado",
+        "pickup_address": "Dirección de recogida",
+        "submitter_provider": "Proveedor que envía",
+        "treating_provider_same_as_submitter": "El proveedor tratante es el mismo",
+        "treating_provider_npi": "NPI del proveedor tratante",
+        "treating_provider_name": "Nombre del proveedor tratante",
+        "treatment_address": "Dónde es la visita",
+        "service_animal": "Animal de servicio",
+        "transport_mode": "Tipo de viaje",
+        "effective_dates": "Fecha(s) del viaje"
+      }
     },
     "provenance": {
       "open": "Cómo lo sabemos",
@@ -231,7 +264,19 @@
         "pending": "Aún sin comprobar"
       }
     },
-    "largeType": "Texto grande"
+    "largeType": "Texto grande",
+    "ride": {
+      "appointment": "Cita: {{when}}",
+      "checkIn": "Regístrese antes de las {{time}}",
+      "ends": "La visita termina alrededor de las {{time}}",
+      "escort": "Un adulto debe regresar a casa con usted después de esta visita.",
+      "pickup": "El servicio de transporte confirma la hora en que le recogen."
+    },
+    "prep": {
+      "reviewed": "Hoja de preparación lista: revisada por una persona en este idioma.",
+      "pending": "Hoja de preparación aún no adjunta: falta la revisión de una persona en este idioma.",
+      "open": "Abrir la hoja de preparación"
+    }
   },
   "about": {
     "title": "Acerca de Slot-to-Stop",

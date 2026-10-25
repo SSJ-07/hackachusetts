@@ -225,6 +225,32 @@ def get_candidate_slot_source() -> CandidateSlotSource:
     return source
 
 
+@functools.lru_cache(maxsize=1)
+def get_clinic_info() -> dict[str, dict[str, str]]:
+    """clinic_id -> {name, address, town} from data/manual/clinics.csv (first row per
+    clinic), with clinic_stops.csv names as a fallback. Committed manual data, so the
+    same in mock and real mode."""
+    import csv as _csv
+
+    info: dict[str, dict[str, str]] = {}
+    clinics_csv = REPO_ROOT / "data" / "manual" / "clinics.csv"
+    if clinics_csv.is_file():
+        with clinics_csv.open(encoding="utf-8", newline="") as fh:
+            for row in _csv.DictReader(fh):
+                cid = (row.get("clinic_id") or "").strip()
+                if cid and cid not in info:
+                    info[cid] = {"name": row.get("clinic_name", "").strip(),
+                                 "address": row.get("address", "").strip(),
+                                 "town": row.get("town", "").strip()}
+    if REAL_CLINIC_STOPS_PATH.is_file():
+        with REAL_CLINIC_STOPS_PATH.open(encoding="utf-8", newline="") as fh:
+            for row in _csv.DictReader(fh):
+                cid = (row.get("clinic_id") or "").strip()
+                if cid and cid not in info:
+                    info[cid] = {"name": row.get("clinic_name", "").strip(), "address": "", "town": ""}
+    return info
+
+
 def get_round_trip() -> RoundTripFn:
     if data_mode() == "real":
         # Task 11: real routing over the PVTA feed via the engine's authoritative

@@ -103,3 +103,11 @@ outcome: Maria: escort-aware ride at 16:30 + ES prep sheet + PT-1 prefill on rea
 ## 2026-10-24 19:43 · sumedh · Crew · topic: other
 what: Demo plumbing: CORS middleware (origins from SLOT_TO_STOP_WEB_ORIGINS), planner slot window [today, +14d] frozen by SLOT_TO_STOP_TODAY in make demo, PlanView shows top 3 options + show-more; merged #14 after fixing a count() race in Kevin's planner e2e
 outcome: localhost demo: API :8000 real mode on the frozen snapshot, web :5173 via /api proxy
+
+## 2026-10-24 20:30 · sumedh · Crew · topic: other
+what: Demo polish: map was blank (glyphs: undefined rejected by MapLibre; worker URL under Vite; container unmounted on lens switch) - fixed all three; RT-8 provenance record added; planner options now carry per-option transit details (leave/arrive, routes, return, last bus, buses, door-to-door) and Holyoke OB/GYN template slots so prenatal shows 'Take the bus' options
+outcome: headless screenshots: both map lenses draw; prenatal 12 distinct slot options with bus lines; Maria 12 rides with bus estimate; tsc, 20 vitest, 9 e2e, 2 axe green
+
+## 2026-10-24 20:43 · sumedh · Crew · topic: other
+what: Planner output fixes from demo review: identical weekday options collapsed into one choice with also_on dates (12 -> distinct trips); prep option now attaches the signed-off EN/ES prep sheet (signoff.json) with known tokens filled and the rest left blank; ride itinerary/phone view show appointment, check-in, visit end, escort rule; PT-1 shows field labels and the clinic name+address
+outcome: Maria: 12 options -> 7 distinct, prep sheet attached (ES, reviewed); fast pytest, 20 vitest, 10 e2e+axe green
