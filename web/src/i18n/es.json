@@ -1,6 +1,6 @@
 {
   "app": {
-    "brand": "Slot-to-Stop",
+    "brand": "CareLeap",
     "skipToContent": "Saltar al contenido principal",
     "language": "Idioma",
     "nav": {
@@ -55,6 +55,12 @@
       "fri": "Vie",
       "sat": "Sáb",
       "sun": "Dom"
+    },
+    "communities": {
+      "all": "Los tres condados",
+      "hampden": "Condado de Hampden (Springfield, Holyoke)",
+      "hampshire": "Condado de Hampshire (Northampton, Amherst)",
+      "franklin": "Condado de Franklin (Greenfield, rural)"
     }
   },
   "suggest": {
@@ -279,8 +285,8 @@
     }
   },
   "about": {
-    "title": "Acerca de Slot-to-Stop",
-    "body": "Slot-to-Stop muestra cómo las horas de cita de la clínica coinciden con el servicio de autobús, para que las clínicas elijan horas a las que más pacientes sin carro puedan llegar. Solo logística. Su equipo de atención decide su atención.",
+    "title": "Acerca de CareLeap",
+    "body": "CareLeap muestra cómo las horas de cita de la clínica coinciden con el servicio de autobús, para que las clínicas elijan horas a las que más pacientes sin carro puedan llegar. Solo logística. Su equipo de atención decide su atención.",
     "guardrail": "Cada número lleva su fuente y año. Los pacientes mostrados son sintéticos."
   }
 }

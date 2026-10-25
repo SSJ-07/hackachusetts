@@ -111,3 +111,8 @@ outcome: headless screenshots: both map lenses draw; prenatal 12 distinct slot o
 ## 2026-10-24 20:43 · sumedh · Crew · topic: other
 what: Planner output fixes from demo review: identical weekday options collapsed into one choice with also_on dates (12 -> distinct trips); prep option now attaches the signed-off EN/ES prep sheet (signoff.json) with known tokens filled and the rest left blank; ride itinerary/phone view show appointment, check-in, visit end, escort rule; PT-1 shows field labels and the clinic name+address
 outcome: Maria: 12 options -> 7 distinct, prep sheet attached (ES, reviewed); fast pytest, 20 vitest, 10 e2e+axe green
+
+## 2026-10-24 20:50 · sumedh · Crew · topic: other
+what: Renamed the product Slot-to-Stop -> CareLeap everywhere: UI title/strings, API title, docs, steering, specs, power (power/careleap), agent careleap-dev, env vars SLOT_TO_STOP_* -> CARELEAP_*, Python package careleap, crew script careleap_feed.py, FINAL-careleap.md
+kiro: past journal entries left untouched (append-only rule); external power repo URL kept (GitHub rename is a manual step)
+outcome: 534 pytest, 20 vitest, 10 e2e+axe green; API + web restarted under CARELEAP_* env

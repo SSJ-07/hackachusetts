@@ -213,19 +213,24 @@ def _collapse_repeats(attend: list[tuple[Option, _Checked | None]]) -> list[tupl
     return kept
 
 
-def _prep_details(lang: str, c: _Checked | None, clinics: Mapping[str, Mapping[str, str]]) -> dict[str, Any]:
-    """The prep option: its review status and, when signed off, the filled sheet."""
+def _prep_details(lang: str, first: tuple[Option, _Checked] | None,
+                  clinics: Mapping[str, Mapping[str, str]]) -> dict[str, Any]:
+    """The prep option: its review status and, when signed off, the filled sheet for the
+    top choice."""
     details: dict[str, Any] = {"language": lang, "template_status": template_status(lang)}
-    if c is None:
+    if first is None:
         return details
+    top, c = first
     info = clinics.get(c.slot.clinic_id, {})
     t = c.trip
     values = {
         "clinic_name": info.get("name", c.slot.clinic_id),
         "appt_date": c.slot.date,
         "appt_time": _hhmm(c.slot.start),
-        # leave-home time only when a bus trip is the plan; a ride's pickup is the broker's
-        "leave_home_time": _hhmm(t.out_legs[0].dep) if (t.reachable and t.out_legs) else "",
+        # leave-home time only when the bus IS the plan; for a ride the broker sets the
+        # pickup, so the line stays blank for the navigator
+        "leave_home_time": (_hhmm(t.out_legs[0].dep)
+                            if top.kind is OptionKind.SLOT and t.reachable and t.out_legs else ""),
     }
     sheet = render_prep_sheet(lang, values)
     if sheet is not None:
@@ -370,7 +375,7 @@ def plan_visit(
                 )
             options[0] = Option(top.kind, top.why, {**top.details, "recurrence": recurrence})
         if rule.prep:
-            first = next((c for _, c in attend if c is not None), None)
+            first = next(((o, c) for o, c in attend if c is not None), None)
             options.append(
                 Option(OptionKind.PREP, REASONS["prep"],
                        _prep_details(barriers.language, first, clinics or {}))

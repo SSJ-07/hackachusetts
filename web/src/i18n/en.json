@@ -1,6 +1,6 @@
 {
   "app": {
-    "brand": "Slot-to-Stop",
+    "brand": "CareLeap",
     "skipToContent": "Skip to main content",
     "language": "Language",
     "nav": {
@@ -55,6 +55,12 @@
       "fri": "Fri",
       "sat": "Sat",
       "sun": "Sun"
+    },
+    "communities": {
+      "all": "All three counties",
+      "hampden": "Hampden County (Springfield, Holyoke)",
+      "hampshire": "Hampshire County (Northampton, Amherst)",
+      "franklin": "Franklin County (Greenfield, rural)"
     }
   },
   "suggest": {
@@ -279,8 +285,8 @@
     }
   },
   "about": {
-    "title": "About Slot-to-Stop",
-    "body": "Slot-to-Stop shows how clinic appointment hours line up with bus service, so clinics can pick hours that more car-less patients can actually reach. Logistics only. Your care team decides your care.",
+    "title": "About CareLeap",
+    "body": "CareLeap shows how clinic appointment hours line up with bus service, so clinics can pick hours that more car-less patients can actually reach. Logistics only. Your care team decides your care.",
     "guardrail": "Every number carries a source and vintage. Patients shown are synthetic."
   }
 }

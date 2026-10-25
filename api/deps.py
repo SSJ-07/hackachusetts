@@ -1,6 +1,6 @@
 """FastAPI dependencies: where each endpoint's data comes from.
 
-`SLOT_TO_STOP_DATA` selects the data mode:
+`CARELEAP_DATA` selects the data mode:
   mock (default) - labelled mocks in api/mocks/ (H1 scaffold).
   real           - real files/engine only. Anything not landed yet returns 503 rather
                    than falling back to mock data silently.
@@ -35,7 +35,7 @@ REAL_RULES_PATH = REPO_ROOT / "planner" / "visit_rules.yaml"
 REAL_PT1_PATH = REPO_ROOT / "data" / "manual" / "pt1_fields.json"
 REAL_CLINIC_SCHEDULE_PATH = REPO_ROOT / "data" / "manual" / "clinic_schedules.csv"
 REAL_PROVENANCE_PATH = REPO_ROOT / "docs" / "provenance.jsonl"
-REAL_PVTA_DIR = cache_dir() / "pvta"  # SLOT_TO_STOP_CACHE_DIR-aware (make demo)
+REAL_PVTA_DIR = cache_dir() / "pvta"  # CARELEAP_CACHE_DIR-aware (make demo)
 REAL_ORIGINS_PATH = cache_dir() / "origins.parquet"
 REAL_CLINIC_STOPS_PATH = REPO_ROOT / "data" / "manual" / "clinic_stops.csv"
 
@@ -44,9 +44,9 @@ CandidateSlotSource = Callable[[VisitRule], Sequence[CandidateSlot]]
 
 
 def data_mode() -> DataMode:
-    mode = os.environ.get("SLOT_TO_STOP_DATA", "mock")
+    mode = os.environ.get("CARELEAP_DATA", "mock")
     if mode not in ("mock", "real"):
-        raise RuntimeError(f"SLOT_TO_STOP_DATA must be 'mock' or 'real', got {mode!r}")
+        raise RuntimeError(f"CARELEAP_DATA must be 'mock' or 'real', got {mode!r}")
     return mode  # type: ignore[return-value]
 
 
@@ -187,16 +187,16 @@ def get_pt1_fields() -> tuple[Pt1Field, ...]:
 
 
 def _slot_window() -> tuple[str, str]:
-    """[today, today + SLOT_TO_STOP_SLOT_HORIZON_DAYS] as ISO dates.
+    """[today, today + CARELEAP_SLOT_HORIZON_DAYS] as ISO dates.
 
-    SLOT_TO_STOP_TODAY freezes "today" so a frozen demo snapshot (whose slots were
+    CARELEAP_TODAY freezes "today" so a frozen demo snapshot (whose slots were
     generated for a fixed date range) keeps answering the same way; `make demo` sets it.
     """
     import datetime as _dt
 
-    today_s = os.environ.get("SLOT_TO_STOP_TODAY", "").strip()
+    today_s = os.environ.get("CARELEAP_TODAY", "").strip()
     today = _dt.date.fromisoformat(today_s) if today_s else _dt.date.today()
-    days = int(os.environ.get("SLOT_TO_STOP_SLOT_HORIZON_DAYS", "14"))
+    days = int(os.environ.get("CARELEAP_SLOT_HORIZON_DAYS", "14"))
     return today.isoformat(), (today + _dt.timedelta(days=days)).isoformat()
 
 
