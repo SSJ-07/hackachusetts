@@ -112,7 +112,7 @@ def clinic_section(clinic_id: str, clinic_name: str, community: str, day: str,
     )
 
 
-def report_html(sections: Sequence[str], title: str = "Slot-to-Stop clinic audit") -> str:
+def report_html(sections: Sequence[str], title: str = "CareLeap clinic audit") -> str:
     return (f"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>{_e(title)}</title>"
             f"<style>{CSS}</style></head><body>{''.join(sections)}</body></html>")
 
@@ -163,4 +163,4 @@ def get_report(
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE,
                             detail=f"{exc}; use format=html, or install the GTK runtime") from exc
     return Response(content=pdf, media_type="application/pdf",
-                    headers={"Content-Disposition": 'inline; filename="slot-to-stop-audit.pdf"'})
+                    headers={"Content-Disposition": 'inline; filename="careleap-audit.pdf"'})
